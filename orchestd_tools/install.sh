@@ -80,5 +80,5 @@ show "do you want install?\n[1]Yes\n[2]No"
 	esac
 fi
 
-
-./run.sh
+echo "###  docker-compose run DBs and tools  ###"
+docker-compose -f docker-compose.yml up -d
