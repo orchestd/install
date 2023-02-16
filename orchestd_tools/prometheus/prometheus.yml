@@ -1,0 +1,24 @@
+global:
+  scrape_interval:     10s
+  evaluation_interval: 10s
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+
+rule_files:
+
+scrape_configs:
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['localhost:8081']
+  - job_name: 'monitoring/grafana'
+    static_configs:
+      - targets: [ 'localhost:3000' ]
+  - job_name: 'monitoring/prometheus'
+    static_configs:
+      - targets: [ 'localhost:9090' ]
+  - job_name: 'monitoring/loki'
+    static_configs:
+      - targets: [ 'localhost:3100' ]

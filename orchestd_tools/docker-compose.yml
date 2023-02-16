@@ -1,0 +1,140 @@
+x-logging: &default-logging
+  driver: loki
+  options:
+    labels: namespace
+    loki-url: "http://localhost:3100/loki/api/v1/push"
+    loki-retries: "5"
+    loki-batch-size: "400"
+    loki-external-labels: "app={{.Name}},env=$HEILA_ENV,type=$HEILA_TYPE"
+    loki-relabel-config: |
+      - action: replace
+        source_labels: ["compose_service","namespace"]
+        separator: "/"
+        target_label: job
+      - action: replace
+        source_labels: ["container_name"]
+        target_label: instance
+
+version: '3.7'
+
+volumes:
+  prometheus_data: { }
+  grafana_data: { }
+  mongodb_data: { }
+  loki-data: { }
+
+
+services:
+  reverse-proxy:
+    #    ports:
+    #      - "80:80" #Traefik port
+    #      - "8080:8080" #Traefik dashboard
+    image: traefik:v2.4.8
+    container_name: "traefik_orchestd"
+    restart: unless-stopped
+    labels:
+      namespace: monitoring
+    command:
+      - "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    network_mode: host
+    logging:
+      options:
+        max-size: "1m"
+        max-file: "1"
+
+  jaeger:
+    #    ports:
+    #      - "6831:6831/udp"
+    #      - "16686:16686"
+    image: jaegertracing/all-in-one:latest
+    network_mode: host
+
+    labels:
+      namespace: monitoring
+      traefik.http.routers.jaeger.rule: Host(`jaeger.localhost`)
+      traefik.http.routers.jaeger.entrypoints: web
+      traefik.http.routers.jaeger.service: jaeger
+      traefik.http.services.jaeger.loadbalancer.server.port: 16686
+    logging: *default-logging
+
+  prometheus:
+    #    ports:
+    #      - 9090:9090
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    restart: always
+    network_mode: host
+    labels:
+      - "namespace=monitoring"
+      - "traefik.http.routers.prometheus.rule=Host(`prometheus.localhost`)"
+      - "traefik.http.routers.prometheus.service=prometheus"
+      - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
+    logging: *default-logging
+    deploy:
+      mode: global
+  grafana:
+    #    ports:
+    #      - 3000:3000
+    image: grafana/grafana:latest
+    depends_on:
+      - prometheus
+    volumes:
+      - ./grafana/dashboards:/etc/grafana/dashboards
+      - ./grafana/datasources/datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+      - ./grafana/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml
+      - grafana_data:/var/lib/grafana
+    network_mode: host
+    labels:
+      - "namespace=monitoring"
+      - "traefik.http.routers.grafana.rule=Host(`grafana.localhost`)"
+      - "traefik.http.routers.grafana.service=grafana"
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+    logging: *default-logging
+  mongo:
+    #    ports:
+    #      - 27017:27017
+    image: mongo:5.0.2
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: orchestd2023!
+    network_mode: host
+    labels:
+      - "namespace=orchestd"
+      - "traefik.http.routers.mongo.rule=Host(`mongodb.server`)"
+      - "traefik.http.routers.mongo.service=mongo"
+      - "traefik.http.services.mongo.loadbalancer.server.port=27017"
+    logging: *default-logging
+  mongo_seed:
+    container_name: mongo_seed
+    build: ./mongo/
+    network_mode: host
+    depends_on:
+      - mongo
+  loki:
+    #    ports:
+    #      - "3100:3100"
+    image: grafana/loki:2.0.0
+    command: -config.file=/mnt/config/loki-config.yml
+    network_mode: host
+    volumes:
+      - ./loki:/mnt/config
+      - loki-data:/loki
+    labels:
+      - "namespace=monitoring"
+      - "traefik.http.routers.loki.rule=Host(`loki.localhost`)"
+      - "traefik.http.routers.loki.service=loki"
+      - "traefik.http.services.loki.loadbalancer.server.port=3100"
+    logging: *default-logging

@@ -1,0 +1,36 @@
+# config file version
+apiVersion: 1
+
+# list of datasources that should be deleted from the database
+deleteDatasources:
+  - name: Prometheus
+    orgId: 1
+
+# list of datasources to insert/update depending
+# whats available in the database
+datasources:
+  # <string, required> name of the datasource. Required
+  - name: 'Prometheus'
+    type: 'prometheus'
+    access: 'proxy'
+    org_id: 1
+    url: 'http://localhost:9090'
+    is_default: true
+    version: 1
+    editable: true
+  - name: Loki
+    type: loki
+    uid: loki
+    access: proxy
+    orgId: 1
+    url: http://localhost:3100
+    basicAuth: false
+    isDefault: false
+    version: 1
+    editable: false
+    apiVersion: 1
+    jsonData:
+      derivedFields:
+        - name: TraceID
+          matcherRegex: '"traceId"\s*:\s*"(.+?)"'
+          url: 'http://localhost:16686/trace/$${__value.raw}'
