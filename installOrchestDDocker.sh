@@ -1,5 +1,7 @@
 #!/bin/bash
 
+./orchestd_tools/install.sh
+
 origpath=$PWD
 
 export ORCHESTD_REGISTRY=eu.gcr.io/orchestd-io
