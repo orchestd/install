@@ -1,6 +1,8 @@
 #!/bin/bash
 
-./orchestd_tools/install.sh
+cd orchestd_tools
+./install.sh
+cd ..
 
 origpath=$PWD
 
