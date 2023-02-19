@@ -13,7 +13,7 @@ In order to run orchestD, You would need Supported versions of
 
 # Installation:
 ```
-$ git clone https://github.com/orchestd/install.git
-$ cd orchestd
+$ git clone https://github.com/orchestd/install.git instal-orchestd
+$ cd instal-orchestd
 $ ./installOrchestDDocker.sh
 ```
