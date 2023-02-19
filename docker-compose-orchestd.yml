@@ -11,7 +11,7 @@ services:
       - GIN_MODE
       - DOCKER_NAME=orchestD
       - GOPATH=/home/work
-      - GOROOT=/usr/local/go
+      - GOROOT=/usr/local/godiscoveryservice
       - GOPRIVATE
     volumes:
       - /home/$USER/orchestD:/home/orchestD
@@ -29,3 +29,42 @@ services:
         loki-retries: "5"
         loki-batch-size: "400"
         loki-external-labels: "app={{.Name}},env=$HEILA_ENV,type=$HEILA_TYPE"
+
+  discoveryservice:discoveryservice
+    #PORT 8500
+    image: ${HEILA_REGISTRY}/discoveryservice:latest
+    container_name: "discoveryservice"
+    restart: unless-stopped
+    user: ${DOCKER_USER}
+    environment:
+      - DOCKER_NAME=discoveryservice
+      - HEILA_TYPE=HEAD
+      - HEILA_ENV=LOCAL
+      - HEILA_STORE
+      - GIN_MODE
+      - logToFile=false
+      - sessionCollection=sessions
+      - JAEGER_AGENT_HOST=${JAEGER_AGENT_HOST}
+      - JAEGER_AGENT_PORT=${JAEGER_AGENT_PORT}
+      - JAEGER_SAMPLER_TYPE=${JAEGER_SAMPLER_TYPE}
+      - JAEGER_SAMPLER_PARAM=${JAEGER_SAMPLER_PARAM}
+      - port=8500
+      - consoleJsonFormat=true
+      - discoveryServiceProvider=none
+    volumes:
+      - /etc/hosts:/etc/hosts
+    dns:
+      - 8.8.8.8
+    dns_opt:
+      - use-vc
+    network_mode: host
+    labels:
+      namespace: digital
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+        loki-retries: "5"
+        loki-batch-size: "400"
+        loki-external-labels: "app={{.Name}},env=$HEILA_ENV,type=$HEILA_TYPE"
+
