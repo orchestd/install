@@ -70,6 +70,11 @@ fi
 GITPATH="https://github.com/$GITUSER"
 
 userPath=/home/$USER/orchestD
+
+if [ -f "${userPath}/settings/git.json" ]; then
+  printf "{\n\t\"server\":\"$GITPATH\",\n\t\"devBranch\": \"main\",\n\t\"lockedBranches\":[\"dev\",\"master\",\"main\"]\n}\n" > ${userPath}/settings/git.json
+fi
+
 if [ ! -d "${userPath}" ];
 then
 
@@ -138,6 +143,15 @@ fi
 
 
 cd $userPath/bin/
+
+alreadyEx=$(cat ~/.bashrc | grep '~/orchestd/bin')
+if [ ${#alreadyEx} == 0 ]; then
+  show "setting path to ~/.bashrc"
+  echo "" >> ~/.bashrc
+  echo "# orchestd" >> ~/.bashrc
+  echo 'export PATH=$PATH:~/orchestd/bin' >> ~/.bashrc
+  source ~/.bashrc
+fi
+
 nohup ./orchestD &
-
-
+google-chrome http://orchestd.localhost:29000/
