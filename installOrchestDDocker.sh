@@ -71,10 +71,6 @@ GITPATH="https://github.com/$GITUSER"
 
 userPath=/home/$USER/orchestD
 
-if [ -f "${userPath}/settings/git.json" ]; then
-  printf "{\n\t\"server\":\"$GITPATH\",\n\t\"devBranch\": \"main\",\n\t\"lockedBranches\":[\"dev\",\"master\",\"main\"]\n}\n" > ${userPath}/settings/git.json
-fi
-
 if [ ! -d "${userPath}" ];
 then
 
@@ -88,12 +84,13 @@ then
 
   show "settings folder"
   mkdir -p ${userPath}/settings
-  printf "{\n\t\"server\":\"$GITPATH\",\n\t\"devBranch\": \"main\",\n\t\"lockedBranches\":[\"dev\",\"master\",\"main\"]\n}\n" > ${userPath}/settings/git.json
 
   show "bin folder"
   mkdir ${userPath}/bin
 
 fi
+
+printf "{\n\t\"server\":\"$GITPATH\",\n\t\"devBranch\": \"main\",\n\t\"lockedBranches\":[\"dev\",\"master\",\"main\"]\n}\n" > ${userPath}/settings/git.json
 
 show "go to src folder"
 cd $userPath/src
@@ -144,9 +141,9 @@ fi
 
 cd $userPath/bin/
 
-pathAlreadyExists=$(cat ~/.bashrc | grep '~/orchestd/bin')
+pathAlreadyExists=$(grep '~/orchestd/bin' ~/.bashrc)
 if [ ${#pathAlreadyExists} == 0 ]; then
-  show "setting path to ~/.bashrc"
+  show "Adding path to ~/.bashrc"
   echo "" >> ~/.bashrc
   echo "# orchestd" >> ~/.bashrc
   echo 'export PATH=$PATH:~/orchestd/bin' >> ~/.bashrc
@@ -155,6 +152,6 @@ fi
 
 nohup ./orchestD &
 
-orchestDUrl=http://orchestd.localhost:29000/
+orchestDUrl=http://127.0.0.1:29000/
 show "Installation successful. click $orchestDUrl to start working"
 xdg-open $orchestDUrl
