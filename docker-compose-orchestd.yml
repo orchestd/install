@@ -11,7 +11,7 @@ services:
       - GIN_MODE
       - DOCKER_NAME=orchestD
       - GOPATH=/home/work
-      - GOROOT=/usr/local/godiscoveryservice
+      - GOROOT=/usr/local/go
       - GOPRIVATE
     volumes:
       - /home/$USER/orchestD:/home/orchestD
@@ -30,9 +30,9 @@ services:
         loki-batch-size: "400"
         loki-external-labels: "app={{.Name}},env=$HEILA_ENV,type=$HEILA_TYPE"
 
-  discoveryservice:discoveryservice
+  discoveryservice:
     #PORT 8500
-    image: ${HEILA_REGISTRY}/discoveryservice:latest
+    image: ${ORCHESTD_REGISTRY}/discoveryservice:latest
     container_name: "discoveryservice"
     restart: unless-stopped
     user: ${DOCKER_USER}
