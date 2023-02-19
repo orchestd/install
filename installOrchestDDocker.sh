@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd orchestd_tools
+cd integrations
 ./install.sh
 cd ..
 
@@ -144,8 +144,8 @@ fi
 
 cd $userPath/bin/
 
-alreadyEx=$(cat ~/.bashrc | grep '~/orchestd/bin')
-if [ ${#alreadyEx} == 0 ]; then
+pathAlreadyExists=$(cat ~/.bashrc | grep '~/orchestd/bin')
+if [ ${#pathAlreadyExists} == 0 ]; then
   show "setting path to ~/.bashrc"
   echo "" >> ~/.bashrc
   echo "# orchestd" >> ~/.bashrc
@@ -154,4 +154,7 @@ if [ ${#alreadyEx} == 0 ]; then
 fi
 
 nohup ./orchestD &
-google-chrome http://orchestd.localhost:29000/
+
+orchestDUrl=http://orchestd.localhost:29000/
+show "Installation successful. click $orchestDUrl to start working"
+xdg-open $orchestDUrl
