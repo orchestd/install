@@ -139,9 +139,14 @@ do
 done
 fi
 
-
-
 cd $origpath
+
+# copy install folder
+mkdir $userPath/bin/install
+cp -r docker-compose-orchestd.yml $userPath/bin/install
+cp -r orchestD.sh $userPath/bin/install
+cp -r integrations $userPath/bin/install
+
 show "###  docker-compose run orchestD  ###"
 docker-compose -f docker-compose-orchestd.yml up -d
 
@@ -154,12 +159,12 @@ fi
 
 cd $userPath/bin/
 
-pathAlreadyExists=$(grep '~/orchestd/bin' ~/.bashrc)
+pathAlreadyExists=$(grep '~/orchestD/bin' ~/.bashrc)
 if [ ${#pathAlreadyExists} == 0 ]; then
   show "Adding path to ~/.bashrc"
   echo "" >> ~/.bashrc
   echo "# orchestd" >> ~/.bashrc
-  echo 'export PATH=$PATH:~/orchestd/bin' >> ~/.bashrc
+  echo 'export PATH=$PATH:~/orchestD/bin' >> ~/.bashrc
   source ~/.bashrc
 fi
 
