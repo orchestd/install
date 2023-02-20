@@ -35,12 +35,12 @@ Once done, the orchestD process will run and serve UI from [http://localhost:290
 
 To stop orchestD
 ```
-$ orchestD.sh stop
+$ orchestd.sh stop
 ```
 
 To start orchestD again
 ```
-$ orchestD.sh start
+$ orchestd.sh start
 ```
 
 ## Happy Coding!
