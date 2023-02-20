@@ -32,11 +32,18 @@ function installSshKey() {
         read -p "> " INPSEL
     	case $INPSEL in
     	    "1")
-    	    show "ssh-keygen -t ed25519 -C \"xxxx@gmail.com\"\nEnter -> Enter (empty passphrase)\neval \"$(ssh-agent -s)\"\nssh-add ~/.ssh/id_ed25519\n\necho copy this value $(cat ~/.ssh/id_ed25519.pub) to here:\nhttps://github.com/settings/keys\nunder \"new ssh key\"\n"
+    	    show 'ssh-keygen -t ed25519 -C \"xxxx@gmail.com\"\n
+    	    Enter -> Enter (empty passphrase)\n
+    	    eval \"$(ssh-agent -s)\"\n
+    	    ssh-add ~/.ssh/id_ed25519\n\n
+    	    echo copy this value $(cat ~/.ssh/id_ed25519.pub) to here:\n
+    	    https://github.com/settings/keys\n
+    	    under \"new ssh key\"\n'
           exit
     			;;
     	    "2")
-          show "please follow \nhttps://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account"
+          show "please follow \n
+          https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account"
           exit
           ;;
     	esac
@@ -61,7 +68,10 @@ fi
 
   isGithub=$(ssh -T git@github.com 2>&1)
             if [[ $isGithub != *"Permission denied"* ]]; then
-            show " please type your github user (not email), i.e. if your github path is \n   https://github.com/leonardo-da-vinci \nplease type: \n\n leonardo-da-vinci"
+            show " please type your github user (not email), i.e. if your github path is \n
+            https://github.com/leonardo-da-vinci \n
+            please type: \n\n
+            leonardo-da-vinci"
               read -p '> ' GITUSER
             else
               installSshKey
