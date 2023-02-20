@@ -22,8 +22,8 @@ If your git cli is not configured to use github, please complete the [github cli
 Open a terminal, cd to the desired destination folder, clone the installtion repo and run the installer:
 ```
 $ cd path/to/folder
-$ git clone https://github.com/orchestd/install.git instal-orchestd
-$ cd instal-orchestd
+$ git clone https://github.com/orchestd/install.git install-orchestd
+$ cd install-orchestd
 $ ./installOrchestDDocker.sh
 ```
 
