@@ -59,6 +59,7 @@ show "Show you how?\n[1]Yes\n[2]No"
 	case $INPSEL in
 	    "1")
             show "https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-email-preferences/setting-your-commit-email-address#setting-your-email-address-for-every-repository-on-your-computer"
+            exit
 			;;
 	    "2")
             exit
