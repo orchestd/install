@@ -23,3 +23,5 @@ Enable github access using ssh key, [follow the process in this link](https://do
 4. Use the public key to create "New SSH Key" in your github account here: 
     [https://github.com/settings/ssh/new](https://github.com/settings/ssh/new)
 <br /><br />
+
+[back to installation manual](https://github.com/orchestd/install/tree/main/README.md)
