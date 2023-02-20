@@ -4,6 +4,8 @@ cd integrations
 ./install.sh
 cd ..
 
+reset;
+
 origpath=$PWD
 
 export ORCHESTD_REGISTRY=eu.gcr.io/orchestd-io
