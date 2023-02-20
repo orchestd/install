@@ -17,11 +17,13 @@ In order to run orchestD, have the following installed on your computer:
 
 If your git cli is not configured to use github, please complete the [github cli connection process](https://github.com/orchestd/install/tree/main/connect-github.md)
 
+Please create a repo where all your specs will be saved : https://github.com/new?repo_name=apispecs
+
 ## Installation
 
 Open a terminal, cd to the desired destination folder, clone the installtion repo and run the installer:
 ```
-$ cd path/to/folder
+$ #cd path/to/folder    #you can go to a folder where your repos are
 $ git clone https://github.com/orchestd/install.git install-orchestd
 $ cd install-orchestd
 $ ./installOrchestDDocker.sh
