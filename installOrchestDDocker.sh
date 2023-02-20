@@ -144,7 +144,7 @@ cd $origpath
 # copy install folder
 mkdir $userPath/bin/install
 cp -r docker-compose-orchestd.yml $userPath/bin/install
-cp -r orchestD.sh $userPath/bin/install
+cp -r orchestd.sh $userPath/bin/install
 cp -r integrations $userPath/bin/install
 
 show "###  docker-compose run orchestD  ###"
