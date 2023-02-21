@@ -74,10 +74,10 @@ fi
 
   isGithub=$(ssh -T git@github.com 2>&1)
             if [[ $isGithub != *"Permission denied"* ]]; then
-            show " please type your github user (not email), i.e. if your github path is \n
-            https://github.com/leonardo-da-vinci \n
-            please type: \n\n
-            leonardo-da-vinci"
+show " please type your github user (not email), i.e. if your github path is
+https://github.com/leonardo-da-vinci
+please type: \n
+leonardo-da-vinci"
               read -p '> ' GITUSER
             else
               installSshKey
