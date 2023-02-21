@@ -32,7 +32,7 @@ if [[ ${DigestCurrent} != ${DigestNew} ]]; then
   docker-compose -f docker-compose-orchestd.yml stop
   docker-compose -f docker-compose-orchestd.yml up -d
 else
-    echo "nothing changed"
+    echo "New version updated"
 fi
 
 else
