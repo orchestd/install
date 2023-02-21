@@ -29,7 +29,7 @@ function show {
 }
 
 function installSshKey() {
-    how " it looks like you dont have git cli ssh key, which is the secured way to connect to github how would you like to proceed ?"
+    show " it looks like you dont have git cli ssh key, which is the secured way to connect to github how would you like to proceed ?"
     show "[1]show me the bash script and I will run it  \n[2]I will do it manually"
         read -p "> " INPSEL
     	case $INPSEL in
