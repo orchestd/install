@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#cd ~/orchestD/bin
+cd ~/orchestD/bin
 
 export ORCHESTD_REGISTRY=eu.gcr.io/orchestd-io
 export HEILA_TYPE=HEAD
