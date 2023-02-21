@@ -10,7 +10,7 @@ In order to run orchestD, have the following installed on your computer:
 * [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [Docker Engine](https://docs.docker.com/engine/install/)
 * [Docker Compose](https://docs.docker.com/compose/install/)
-* [Goland IDE](https://www.jetbrains.com/go/)
+* [Goland IDE](https://www.jetbrains.com/go/) or [Visual Studio Code with go plugin](https://learn.microsoft.com/en-us/azure/developer/go/configure-visual-studio-code)
 
 
 ## GitHub
@@ -50,5 +50,7 @@ orchestd.sh start
 You are ready to go!
 
 Go to  [https://www.orchestd.io/api-design](https://www.orchestd.io/api-design) for a complete tutorial to your first orchestD experience.
+
+For any questions or requests: [info@orchestd.io](mailto:info@orchestd.io)
 
 
