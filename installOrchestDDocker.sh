@@ -41,13 +41,13 @@ ssh-add ~/.ssh/id_ed25519\n
 echo copy this value $(cat ~/.ssh/id_ed25519.pub) to here:
 https://github.com/settings/keys
 under "new ssh key"'
-          show '###   When you done installing git cli ssh key, please press [enter]'
+          show '###   When your done installing git cli ssh key, please press [enter]'
           read -n 1 -s -r -p ""
     			;;
     	    "2")
           show "please follow \n
           https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account"
-          show '###   When you done installing git cli ssh key, please press [enter]'
+          show '###   When your done installing git cli ssh key, please press [enter]'
           read -n 1 -s -r -p ""
 
           ;;
