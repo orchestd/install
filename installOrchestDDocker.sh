@@ -34,19 +34,22 @@ function installSshKey() {
         read -p "> " INPSEL
     	case $INPSEL in
     	    "1")
-    	    show 'ssh-keygen -t ed25519 -C \"xxxx@gmail.com\"\n
-    	    Enter -> Enter (empty passphrase)\n
-    	    eval \"$(ssh-agent -s)\"\n
-    	    ssh-add ~/.ssh/id_ed25519\n\n
-    	    echo copy this value $(cat ~/.ssh/id_ed25519.pub) to here:\n
-    	    https://github.com/settings/keys\n
-    	    under \"new ssh key\"\n'
-          exit
+show 'ssh-keygen -t ed25519 -C "xxxx@gmail.com"
+Enter -> Enter (empty passphrase)
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519\n
+echo copy this value $(cat ~/.ssh/id_ed25519.pub) to here:
+https://github.com/settings/keys
+under "new ssh key"'
+          show '###   When your done installing git cli ssh key, please press [enter]'
+          read -n 1 -s -r -p ""
     			;;
     	    "2")
           show "please follow \n
           https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account"
-          exit
+          show '###   When your done installing git cli ssh key, please press [enter]'
+          read -n 1 -s -r -p ""
+
           ;;
     	esac
 }
