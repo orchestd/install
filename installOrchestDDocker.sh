@@ -7,6 +7,7 @@ cd ..
 reset;
 
 origpath=$PWD
+userPath=/home/$USER/orchestD
 
 export ORCHESTD_REGISTRY=eu.gcr.io/orchestd-io
 export HEILA_TYPE=HEAD
@@ -26,6 +27,32 @@ function show {
 	fi
 	echo ""
 	echo -e "${fnt}${txt}`tput sgr0`"
+}
+
+function readGithubUser() {
+      show " please type your github user (not email), i.e. if your github path is
+https://github.com/leonardo-da-vinci
+please type:
+leonardo-da-vinci"
+          read -p '> ' gituser
+}
+
+
+function readGithubMail() {
+    if [ $? -ne 0 ]; then
+    show "Need to config git  user.email"
+    show "Show you how?\n[1]Yes\n[2]No"
+        read -p "> " INPSEL
+    	case $INPSEL in
+    	    "1")
+                show "https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-email-preferences/setting-your-commit-email-address#setting-your-email-address-for-every-repository-on-your-computer"
+                exit
+    			;;
+    	    "2")
+                exit
+    			;;
+    	esac
+    fi
 }
 
 function installSshKey() {
@@ -56,36 +83,36 @@ under "new ssh key"'
 
 #  make sure you have an active git user on either GH or BBKT
 show "checking git config user.email:"
-git config user.email
-if [ $? -ne 0 ]; then
-show "Need to config git  user.email"
-show "Show you how?\n[1]Yes\n[2]No"
+gitemail=$(git config user.email)
+readGithubMail
+
+isGithub=$(ssh -T git@github.com 2>&1)
+if [[ $isGithub != *"Permission denied"* ]]; then
+show "checking git config user.name:"
+gituser=$(git config user.name)
+  if [ $? -ne 0 ]; then
+      readGithubUser
+  else
+      installSshKey
+  fi
+fi
+
+show "would you like to work with this git configuration:\nemail=$gitemail , user=$gituser"
+show "[1]Yes\n[2]No"
     read -p "> " INPSEL
 	case $INPSEL in
 	    "1")
-            show "https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-email-preferences/setting-your-commit-email-address#setting-your-email-address-for-every-repository-on-your-computer"
-            exit
+            printf "{\n\t\"server\":\"$GITPATH\",\n\t\"gitEmail\":\"$gitemail\",\n\t\"devBranch\": \"main\",\n\t\"lockedBranches\":[\"dev\",\"master\",\"main\"]\n}\n" > ${userPath}/settings/git.json
 			;;
 	    "2")
-            exit
+	    readGithubUser
+      readGithubMail
+
 			;;
 	esac
-fi
 
-  isGithub=$(ssh -T git@github.com 2>&1)
-            if [[ $isGithub != *"Permission denied"* ]]; then
-            show " please type your github user (not email), i.e. if your github path is \n
-            https://github.com/leonardo-da-vinci \n
-            please type: \n\n
-            leonardo-da-vinci"
-              read -p '> ' GITUSER
-            else
-              installSshKey
-            fi
 
-GITPATH="https://github.com/$GITUSER"
-
-userPath=/home/$USER/orchestD
+GITPATH="https://github.com/$gituser"
 
 if [ ! -d "${userPath}" ];
 then
@@ -106,7 +133,7 @@ then
 
 fi
 
-printf "{\n\t\"server\":\"$GITPATH\",\n\t\"devBranch\": \"main\",\n\t\"lockedBranches\":[\"dev\",\"master\",\"main\"]\n}\n" > ${userPath}/settings/git.json
+printf "{\n\t\"server\":\"$GITPATH\",\n\t\"gitEmail\":\"$gitemail\",\n\t\"devBranch\": \"main\",\n\t\"lockedBranches\":[\"dev\",\"master\",\"main\"]\n}\n" > ${userPath}/settings/git.json
 
 show "go to src folder"
 cd $userPath/src
@@ -126,6 +153,9 @@ while [[ $isClone = false ]]
 do
        if git clone $GITPATH/$apispecs 4>&1; then
           isClone=true
+          # set git config
+          git config user.email $gitemail
+          git config user.user $giteuser
        else
                  show "Open this link https://github.com/new?repo_name=$apispecs and create repo"
                  show "Have you created spispecs repo? \n[1] Yes\n[2] No\n"
