@@ -62,11 +62,11 @@ function installSshKey() {
     	case $INPSEL in
     	    "1")
     	    tempMail=$gitemail
-    	    if [[ $tempMail =="" ]] then
+    	    if [[ $tempMail == "" ]]; then
     	      tempMail="xxxx@gmail.com"
     	      fi
-show 'ssh-keygen -t ed25519 -C "xxxx@gmail.com"
-Enter -> Enter (empty passphrase)
+show "ssh-keygen -t ed25519 -C ${tempMail}"
+show 'Enter -> Enter (empty passphrase)
 eval "$(ssh-agent -s)"
 ssh-add ~/.ssh/id_ed25519\n
 echo copy this value $(cat ~/.ssh/id_ed25519.pub) to here:
@@ -86,13 +86,13 @@ under "new ssh key"'
 }
 
 #  make sure you have an active git user on either GH or BBKT
-show "checking git config user.email:"
+show "checking git config user.email..."
 gitemail=$(git config user.email)
 readGithubMail
 
 isGithub=$(ssh -T git@github.com 2>&1)
 if [[ $isGithub != *"Permission denied"* ]]; then
-show "checking git config user.name:"
+show "checking git config user.name..."
 gituser=$(git config user.name)
   if [ $? -ne 0 ]; then
       readGithubUser
