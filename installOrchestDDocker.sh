@@ -128,7 +128,8 @@ function confirmeGitParams {
     checkGitCliSshKey
     readGitFromEnv
 
-if [[ "$gitemail" == "" || "$gituser" == "" ]]; THEN
+if [[ "$gitemail" == "" || "$gituser" == "" ]];
+then
   	requestGithubEmail
   	requestGithubUser
   	requestGithubUrl
