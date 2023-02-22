@@ -1,12 +1,13 @@
 #!/bin/bash
 
+origpath=$PWD
+
 cd integrations
 ./install.sh
 cd ..
 
 reset;
 
-origpath=$PWD
 userPath=/home/$USER/orchestD
 
 export ORCHESTD_REGISTRY=eu.gcr.io/orchestd-io
@@ -36,31 +37,22 @@ function requestGithubUser {
 
 function requestGithubEmail {
     show "please type your github email, e.g. mymail@gmail.com / mymail@mycompany.com :"
+    show "how do I find it ? https://github.com/settings/emails"
         read -p "> " gitemail
 }
 
-function readGithubEmailFromEnv {
-  show "checking git config user.email..."
-  gitemail=$(git config user.email)
-  if [ $? -ne 0 ]; then
-  show "how do I find it ? https://github.com/settings/emails"
-  requestGithubEmail
-  fi
-}
-
-function readGithubUserFromEnv {
-      show "checking git config user.name..."
-      gituser=$(git config user.name)
-        if [ $? -ne 0 ]; then
-            requestGithubUser
-        fi
-}
-
-function readGithubUrl {
+function requestGithubUrl {
     show "please type the github url you will be working on for this development project:
           (if its youre private github, its probably https://github/${gituser}, if its a company shared github, its probably something like https://github/mycompany)"
     read -p "> https://github.com/" resGitUrl
     gitUrl="https://github.com/$resGitUrl"
+}
+
+function readGitConf {
+      show "checking git config user.email..."
+      gitemail=$(git config user.email)
+      show "checking git config user.name..."
+      gituser=$(git config user.name)
 }
 
 function checkGitCliSshKey {
@@ -109,33 +101,43 @@ fi
 
 }
 
-readGithubEmailFromEnv
-readGithubUserFromEnv
-readGithubUrl
-checkGitCliSshKey
+function confirmeGitParams {
+    isDoneGitConfiguration=false
+    while [[ $isDoneGitConfiguration = false ]]
+    do
+    show "would you like to work with this git configuration:\nemail=$gitemail , user=$gituser"
+    show "[1]Yes\n[2]No"
+        read -p "> " INPSEL
+    	case $INPSEL in
+    	    "1")
+            isDoneGitConfiguration=true
+    			;;
+    	    "2")
+    	    requestGithubEmail
+    	    requestGithubUser
+    	    isDoneGitConfiguration=true
+    			;;
+    	   *)
+         show "Unknown command line argument $1"
+        ;;
+    	esac
+    done
+    requestGithubUrl
+}
 
-isDoneGitConfiguration=false
-while [[ $isDoneGitConfiguration = false ]]
-do
-show "would you like to work with this git configuration:\nemail=$gitemail , user=$gituser"
-show "[1]Yes\n[2]No"
-    read -p "> " INPSEL
-	case $INPSEL in
-	    "1")
-      printf "{\n\t\"server\":\"$gitUrl\",\n\t\"gitUser\":\"$gituser\",\n\t\"gitEmail\":\"$gitemail\",\n\t\"devBranch\": \"main\",\n\t\"lockedBranches\":[\"dev\",\"master\",\"main\"]\n}\n" > ${userPath}/settings/git.json
-        isDoneGitConfiguration=true
+    checkGitCliSshKey
+    readGitConf
 
-			;;
-	    "2")
-	    requestGithubEmail
-	    requestGithubUser
-	    isDoneGitConfiguration=true
-			;;
-	   *)
-     show "Unknown command line argument $1"
-    ;;
-	esac
-done
+if [[ "$gitemail" == "" || "$gituser" =="" ]]; THEN
+  	requestGithubEmail
+  	requestGithubUser
+  	requestGithubUrl
+ else
+   confirmeGitParams
+fi
+
+printf "{\n\t\"server\":\"$gitUrl\",\n\t\"gitUser\":\"$gituser\",\n\t\"gitEmail\":\"$gitemail\",\n\t\"devBranch\": \"main\",\n\t\"lockedBranches\":[\"dev\",\"master\",\"main\"]\n}\n" > ${userPath}/settings/git.json
+
 
 if [ ! -d "${userPath}" ];
 then
