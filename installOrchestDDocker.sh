@@ -100,8 +100,9 @@ read -n 1 -s -r -p ""
                 show "[1] Yes\n[2] No\n"
                ;;
 esac
-fi
 done
+fi
+
 }
 
 readGithubEmailFromEnv
