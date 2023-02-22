@@ -61,6 +61,10 @@ function installSshKey() {
         read -p "> " INPSEL
     	case $INPSEL in
     	    "1")
+    	    tempMail=$gitemail
+    	    if [[ $tempMail =="" ]] then
+    	      tempMail="xxxx@gmail.com"
+    	      fi
 show 'ssh-keygen -t ed25519 -C "xxxx@gmail.com"
 Enter -> Enter (empty passphrase)
 eval "$(ssh-agent -s)"
