@@ -179,7 +179,7 @@ fi
 cd $origpath
 
 # copy install folder
-mkdir $userPath/bin/install
+mkdir -p $userPath/bin/install
 cp -r docker-compose-orchestd.yml $userPath/bin
 cp -r orchestd.sh $userPath/bin
 cp -r integrations $userPath/bin/integrations
