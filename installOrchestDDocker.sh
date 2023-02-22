@@ -29,7 +29,7 @@ function show {
 	echo -e "${fnt}${txt}`tput sgr0`"
 }
 
-function readGithubUser() {
+function readGithubUser {
       show " please type your github user (not email), i.e. if your github path is
 https://github.com/leonardo-da-vinci
 please type:
@@ -38,7 +38,7 @@ leonardo-da-vinci"
 }
 
 
-function readGithubMail() {
+function readGithubMail {
     if [ $? -ne 0 ]; then
     show "Need to config git  user.email"
     show "Show you how?\n[1]Yes\n[2]No"
