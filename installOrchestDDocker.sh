@@ -64,10 +64,12 @@ function readGithubUrl {
 }
 
 function checkGitCliSshKey {
-        show "checking git cli ssh key..."
+show "checking git cli ssh key..."
 isGithub=$(ssh -T git@github.com 2>&1)
 echo $isGithub
 if [[ $isGithub == *"Permission denied"* ]]; then
+  while [[ $isDone = false ]]
+  do
 show " it looks like you dont have git cli ssh key, which is the secured way to connect to github how would you like to proceed ?"
 show "[1]show me the bash script and I will run it  \n[2]I will do it manually"
 read -p "> " INPSEL
@@ -99,7 +101,7 @@ read -n 1 -s -r -p ""
                ;;
 esac
 fi
-
+done
 }
 
 readGithubEmailFromEnv
@@ -107,6 +109,8 @@ readGithubUserFromEnv
 readGithubUrl
 checkGitCliSshKey
 
+while [[ $isDone = false ]]
+do
 show "would you like to work with this git configuration:\nemail=$gitemail , user=$gituser"
 show "[1]Yes\n[2]No"
     read -p "> " INPSEL
@@ -120,10 +124,9 @@ show "[1]Yes\n[2]No"
 			;;
 	   *)
      show "Unknown command line argument $1"
-     show "[1] Yes\n[2] No\n"
     ;;
 	esac
-
+done
 
 if [ ! -d "${userPath}" ];
 then
