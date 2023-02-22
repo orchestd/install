@@ -30,11 +30,16 @@ function show {
 }
 
 function readGithubUser {
-      show " please type your github user (not email), i.e. if your github path is
+      show "please type your github user (not email), i.e. if your github path is
 https://github.com/leonardo-da-vinci
 please type:
 leonardo-da-vinci"
           read -p '> ' gituser
+}
+
+function readGithubEmail {
+    show "please type your github email"
+        read -p "> " gitemail
 }
 
 
@@ -55,7 +60,7 @@ function readGithubMail {
     fi
 }
 
-function installSshKey() {
+function installSshKey {
     show " it looks like you dont have git cli ssh key, which is the secured way to connect to github how would you like to proceed ?"
     show "[1]show me the bash script and I will run it  \n[2]I will do it manually"
         read -p "> " INPSEL
@@ -107,8 +112,8 @@ show "[1]Yes\n[2]No"
             printf "{\n\t\"server\":\"$GITPATH\",\n\t\"gitEmail\":\"$gitemail\",\n\t\"devBranch\": \"main\",\n\t\"lockedBranches\":[\"dev\",\"master\",\"main\"]\n}\n" > ${userPath}/settings/git.json
 			;;
 	    "2")
-	    readGithubUser
-      readGithubMail
+	    readGithubUser;
+      readGithubEmail;
 
 			;;
 	esac
