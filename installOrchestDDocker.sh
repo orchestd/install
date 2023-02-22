@@ -217,10 +217,11 @@ fi
 
 cd $userPath/bin/
 
+git init
 git config user.email $gitemail
 git config user.name $giteuser
 
-pathAlreadyExists=$(grep '~/orchestD/bin' '~/.bashrc')
+pathAlreadyExists=$(grep '~/orchestD/bin' ~/.bashrc)
 if [ ${#pathAlreadyExists} == 0 ]; then
   show "Adding path to ~/.bashrc"
   echo "" >> ~/.bashrc
