@@ -43,7 +43,7 @@ function readGithubEmail {
 }
 
 
-function readGithubMail {
+function readGithubMailIfNotExist {
     if [ $? -ne 0 ]; then
     show "Need to config git  user.email"
     show "Show you how?\n[1]Yes\n[2]No"
@@ -93,7 +93,7 @@ under "new ssh key"'
 #  make sure you have an active git user on either GH or BBKT
 show "checking git config user.email..."
 gitemail=$(git config user.email)
-readGithubMail
+readGithubMailIfNotExist
 
 isGithub=$(ssh -T git@github.com 2>&1)
 if [[ $isGithub != *"Permission denied"* ]]; then
@@ -160,9 +160,6 @@ while [[ $isClone = false ]]
 do
        if git clone $GITPATH/$apispecs 4>&1; then
           isClone=true
-          # set git config
-          git config user.email $gitemail
-          git config user.user $giteuser
        else
                  show "Open this link https://github.com/new?repo_name=$apispecs and create repo"
                  show "Have you created spispecs repo? \n[1] Yes\n[2] No\n"
@@ -207,6 +204,10 @@ if [ ${#pathAlreadyExists} == 0 ]; then
   echo 'export PATH=$PATH:~/orchestD/bin' >> ~/.bashrc
   source ~/.bashrc
 fi
+
+# set git config
+git config user.email $gitemail
+git config user.user $giteuser
 
 nohup ./orchestD &
 
