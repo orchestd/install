@@ -114,7 +114,7 @@ readGithubUserFromEnv
 readGithubUrl
 checkGitCliSshKey
 
-$isDoneGitConfiguration=false
+isDoneGitConfiguration=false
 while [[ $isDoneGitConfiguration = false ]]
 do
 show "would you like to work with this git configuration:\nemail=$gitemail , user=$gituser"
@@ -123,13 +123,13 @@ show "[1]Yes\n[2]No"
 	case $INPSEL in
 	    "1")
       printf "{\n\t\"server\":\"$gitUrl\",\n\t\"gitUser\":\"$gituser\",\n\t\"gitEmail\":\"$gitemail\",\n\t\"devBranch\": \"main\",\n\t\"lockedBranches\":[\"dev\",\"master\",\"main\"]\n}\n" > ${userPath}/settings/git.json
-        $isDoneGitConfiguration=true
+        isDoneGitConfiguration=true
 
 			;;
 	    "2")
 	    requestGithubEmail
 	    requestGithubUser
-	    $isDoneGitConfiguration=true
+	    isDoneGitConfiguration=true
 			;;
 	   *)
      show "Unknown command line argument $1"
