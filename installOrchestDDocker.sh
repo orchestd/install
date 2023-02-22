@@ -185,7 +185,7 @@ cp -r orchestd.sh $userPath/bin
 cp -r integrations $userPath/bin/integrations
 
 show "###  docker-compose run orchestD  ###"
-docker-compose -f docker-compose-orchestd.yml up -d
+docker-compose -f $userPath/bin/docker-compose-orchestd.yml up -d
 
 settingspath=$userPath/bin/settings
 if [ ! -d "${settingspath}" ];

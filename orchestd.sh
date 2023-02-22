@@ -30,6 +30,8 @@ DigestNew=$(docker images --digests eu.gcr.io/orchestd-io/servicebuilder --forma
 
 if [[ ${DigestCurrent} != ${DigestNew} ]]; then
   docker-compose -f docker-compose-orchestd.yml stop
+  docker container rm discoveryservice
+  docker container rm orchestD
   docker-compose -f docker-compose-orchestd.yml up -d
   echo "New version updated !"
 else
