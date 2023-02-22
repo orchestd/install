@@ -93,6 +93,10 @@ https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a
 show '###   When your done installing git cli ssh key, please press [enter]'
 read -n 1 -s -r -p ""
 ;;
+              *)
+                show "Unknown command line argument $1"
+                show "[1] Yes\n[2] No\n"
+               ;;
 esac
 fi
 
@@ -114,6 +118,10 @@ show "[1]Yes\n[2]No"
 	    requestGithubEmail
 	    requestGithubUser
 			;;
+	   *)
+     show "Unknown command line argument $1"
+     show "[1] Yes\n[2] No\n"
+    ;;
 	esac
 
 
@@ -165,8 +173,13 @@ do
                 show "ok, let's try again..."
                         ;;
             "2")
-            exit
+            show '###   When your done create repo, please press [enter]'
+              read -n 1 -s -r -p ""
                         ;;
+              *)
+                show "Unknown command line argument $1"
+                show "[1] Yes\n[2] No\n"
+               ;;
         esac
        fi
 done
