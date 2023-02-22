@@ -95,8 +95,6 @@ if [[ $isGithub != *"Permission denied"* ]]; then
 show "checking git config user.name..."
 gituser=$(git config user.name)
   if [ $? -ne 0 ]; then
-      readGithubUser
-  else
       installSshKey
   fi
 fi
