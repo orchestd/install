@@ -30,12 +30,12 @@ function show {
 }
 
 function requestGithubUser {
-      show 'please type your github user, (github -> top right corner, "Signed in as xxx")'
+      show 'please type your github user, (github -> top right corner, "Signed in as xxx"):'
           read -p '> ' gituser
 }
 
 function requestGithubEmail {
-    show "please type your github email, e.g. mymail@gmail.com / mymail@mycompany.com"
+    show "please type your github email, e.g. mymail@gmail.com / mymail@mycompany.com :"
         read -p "> " gitemail
 }
 
@@ -64,8 +64,10 @@ function readGithubUrl {
 }
 
 function checkGitCliSshKey {
+        show "checking git cli ssh key..."
 isGithub=$(ssh -T git@github.com 2>&1)
-if [[ $isGithub != *"Permission denied"* ]]; then
+echo $isGithub
+if [[ $isGithub == *"Permission denied"* ]]; then
 show " it looks like you dont have git cli ssh key, which is the secured way to connect to github how would you like to proceed ?"
 show "[1]show me the bash script and I will run it  \n[2]I will do it manually"
 read -p "> " INPSEL
@@ -93,6 +95,7 @@ read -n 1 -s -r -p ""
 ;;
 esac
 fi
+
 }
 
 readGithubEmailFromEnv
@@ -108,8 +111,8 @@ show "[1]Yes\n[2]No"
       printf "{\n\t\"server\":\"$gitUrl\",\n\t\"gitUser\":\"$gituser\",\n\t\"gitEmail\":\"$gitemail\",\n\t\"devBranch\": \"main\",\n\t\"lockedBranches\":[\"dev\",\"master\",\"main\"]\n}\n" > ${userPath}/settings/git.json
 			;;
 	    "2")
-	    requestGithubEmail;
-	    requestGithubUser;
+	    requestGithubEmail
+	    requestGithubUser
 			;;
 	esac
 
@@ -180,6 +183,7 @@ cp -r integrations $userPath/bin/integrations
 show "###  docker-compose run orchestD  ###"
 docker-compose -f $userPath/bin/docker-compose-orchestd.yml up -d
 
+
 settingspath=$userPath/bin/settings
 if [ ! -d "${settingspath}" ];
 then
@@ -188,18 +192,17 @@ fi
 
 cd $userPath/bin/
 
-pathAlreadyExists=$(grep '~/orchestD/bin' ~/.bashrc)
+git config user.email $gitemail
+git config user.name $giteuser
+
+pathAlreadyExists=$(grep '~/orchestD/bin' '~/.bashrc')
 if [ ${#pathAlreadyExists} == 0 ]; then
   show "Adding path to ~/.bashrc"
   echo "" >> ~/.bashrc
   echo "# orchestd" >> ~/.bashrc
-  echo 'export PATH=$PATH:~/orchestD/bin' >> ~/.bashrc
-  source ~/.bashrc
+  echo 'export PATH=$PATH:~/orchestD/bin' >> '~/.bashrc'
+  source '~/.bashrc'
 fi
-
-# set git config
-git config user.email $gitemail
-git config user.user $giteuser
 
 nohup ./orchestD &
 
