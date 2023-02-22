@@ -122,20 +122,20 @@ function confirmeGitParams {
         ;;
     	esac
     done
-    requestGithubUrl
+
 }
 
-    checkGitCliSshKey
     readGitFromEnv
 
 if [[ "$gitemail" == "" || "$gituser" == "" ]];
 then
   	requestGithubEmail
   	requestGithubUser
-  	requestGithubUrl
  else
    confirmeGitParams
 fi
+requestGithubUrl
+
 
 if [ ! -d "${userPath}" ];
 then
@@ -197,6 +197,13 @@ do
 done
 fi
 
+cd $apispecs
+    git config user.email $gitemail
+    git config user.name $giteuser
+    checkGitCliSshKey
+cd ..
+
+
 cd $origpath
 
 # copy install folder
@@ -216,10 +223,6 @@ then
 fi
 
 cd $userPath/bin/
-
-git init
-git config user.email $gitemail
-git config user.name $giteuser
 
 pathAlreadyExists=$(grep '~/orchestD/bin' ~/.bashrc)
 if [ ${#pathAlreadyExists} == 0 ]; then
