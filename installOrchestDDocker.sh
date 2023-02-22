@@ -29,47 +29,52 @@ function show {
 	echo -e "${fnt}${txt}`tput sgr0`"
 }
 
-function readGithubUser {
-      show "please type your github user (not email), i.e. if your github path is
-https://github.com/leonardo-da-vinci
-please type:
-leonardo-da-vinci"
+function requestGithubUser {
+      show 'please type your github user, (github -> top right corner, "Signed in as xxx")'
           read -p '> ' gituser
 }
 
-function readGithubEmail {
-    show "please type your github email"
+function requestGithubEmail {
+    show "please type your github email, e.g. mymail@gmail.com / mymail@mycompany.com"
         read -p "> " gitemail
 }
 
-
-function readGithubMailIfNotExist {
-    if [ $? -ne 0 ]; then
-    show "Need to config git  user.email"
-    show "Show you how?\n[1]Yes\n[2]No"
-        read -p "> " INPSEL
-    	case $INPSEL in
-    	    "1")
-                show "https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-email-preferences/setting-your-commit-email-address#setting-your-email-address-for-every-repository-on-your-computer"
-                exit
-    			;;
-    	    "2")
-                exit
-    			;;
-    	esac
-    fi
+function readGithubEmailFromEnv {
+  show "checking git config user.email..."
+  gitemail=$(git config user.email)
+  if [ $? -ne 0 ]; then
+  show "how do I find it ? https://github.com/settings/emails"
+  requestGithubEmail
+  fi
 }
 
-function installSshKey {
-    show " it looks like you dont have git cli ssh key, which is the secured way to connect to github how would you like to proceed ?"
-    show "[1]show me the bash script and I will run it  \n[2]I will do it manually"
-        read -p "> " INPSEL
-    	case $INPSEL in
-    	    "1")
-    	    tempMail=$gitemail
-    	    if [[ $tempMail == "" ]]; then
-    	      tempMail="xxxx@gmail.com"
-    	      fi
+function readGithubUserFromEnv {
+      show "checking git config user.name..."
+      gituser=$(git config user.name)
+        if [ $? -ne 0 ]; then
+            requestGithubUser
+        fi
+}
+
+function readGithubUrl {
+    show "please type the github url you will be working on for this development project:
+          (if its youre private github, its probably https://github/${gituser}, if its a company shared github, its probably something like https://github/mycompany)"
+    read -p "> https://github/" resGitUrl
+    gitUrl="https://github/$resGitUrl"
+}
+
+function checkGitCliSshKey {
+isGithub=$(ssh -T git@github.com 2>&1)
+if [[ $isGithub != *"Permission denied"* ]]; then
+show " it looks like you dont have git cli ssh key, which is the secured way to connect to github how would you like to proceed ?"
+show "[1]show me the bash script and I will run it  \n[2]I will do it manually"
+read -p "> " INPSEL
+case $INPSEL in
+"1")
+tempMail=$gitemail
+if [[ $tempMail == "" ]]; then
+tempMail="xxxx@gmail.com"
+fi
 show "ssh-keygen -t ed25519 -C ${tempMail}"
 show 'Enter -> Enter (empty passphrase)
 eval "$(ssh-agent -s)"
@@ -77,49 +82,37 @@ ssh-add ~/.ssh/id_ed25519\n
 echo copy this value $(cat ~/.ssh/id_ed25519.pub) to here:
 https://github.com/settings/keys
 under "new ssh key"'
-          show '###   When your done installing git cli ssh key, please press [enter]'
-          read -n 1 -s -r -p ""
-    			;;
-    	    "2")
-          show "please follow \n
-          https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account"
-          show '###   When your done installing git cli ssh key, please press [enter]'
-          read -n 1 -s -r -p ""
-
-          ;;
-    	esac
+show '###   When your done installing git cli ssh key, please press [enter]'
+read -n 1 -s -r -p ""
+;;
+"2")
+show "please follow \n
+https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account"
+show '###   When your done installing git cli ssh key, please press [enter]'
+read -n 1 -s -r -p ""
+;;
+esac
+fi
 }
 
-#  make sure you have an active git user on either GH or BBKT
-show "checking git config user.email..."
-gitemail=$(git config user.email)
-readGithubMailIfNotExist
-
-isGithub=$(ssh -T git@github.com 2>&1)
-if [[ $isGithub != *"Permission denied"* ]]; then
-show "checking git config user.name..."
-gituser=$(git config user.name)
-  if [ $? -ne 0 ]; then
-      installSshKey
-  fi
-fi
+readGithubEmailFromEnv
+readGithubUserFromEnv
+readGithubUrl
+checkGitCliSshKey
 
 show "would you like to work with this git configuration:\nemail=$gitemail , user=$gituser"
 show "[1]Yes\n[2]No"
     read -p "> " INPSEL
 	case $INPSEL in
 	    "1")
-            printf "{\n\t\"server\":\"$GITPATH\",\n\t\"gitEmail\":\"$gitemail\",\n\t\"devBranch\": \"main\",\n\t\"lockedBranches\":[\"dev\",\"master\",\"main\"]\n}\n" > ${userPath}/settings/git.json
+      printf "{\n\t\"server\":\"$gitUrl\",\n\t\"gitUser\":\"$gituser\",\n\t\"gitEmail\":\"$gitemail\",\n\t\"devBranch\": \"main\",\n\t\"lockedBranches\":[\"dev\",\"master\",\"main\"]\n}\n" > ${userPath}/settings/git.json
 			;;
 	    "2")
-	    readGithubUser;
-      readGithubEmail;
-
+	    requestGithubEmail;
+	    requestGithubUser;
 			;;
 	esac
 
-
-GITPATH="https://github.com/$gituser"
 
 if [ ! -d "${userPath}" ];
 then
@@ -140,7 +133,7 @@ then
 
 fi
 
-printf "{\n\t\"server\":\"$GITPATH\",\n\t\"gitEmail\":\"$gitemail\",\n\t\"devBranch\": \"main\",\n\t\"lockedBranches\":[\"dev\",\"master\",\"main\"]\n}\n" > ${userPath}/settings/git.json
+printf "{\n\t\"server\":\"$gitUrl\",\n\t\"gitUser\":\"$gituser\",\n\t\"gitEmail\":\"$gitemail\",\n\t\"devBranch\": \"main\",\n\t\"lockedBranches\":[\"dev\",\"master\",\"main\"]\n}\n" > ${userPath}/settings/git.json
 
 show "go to src folder"
 cd $userPath/src
@@ -152,13 +145,13 @@ if [ -d "${apispecs}" ];
 then
     show "$apispecs repo exists."
     cd $apispecs
-    git pull $GITPATH/$apispecs
+    git pull $gitUrl/$apispecs
 
 else
 
 while [[ $isClone = false ]]
 do
-       if git clone $GITPATH/$apispecs 4>&1; then
+       if git clone $gitUrl/$apispecs 4>&1; then
           isClone=true
        else
                  show "Open this link https://github.com/new?repo_name=$apispecs and create repo"
@@ -192,7 +185,6 @@ if [ ! -d "${settingspath}" ];
 then
   ln -s $userPath/settings $userPath/bin
 fi
-
 
 cd $userPath/bin/
 
