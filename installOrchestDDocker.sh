@@ -64,6 +64,7 @@ function readGithubUrl {
 }
 
 function checkGitCliSshKey {
+  isDone=false
 show "checking git cli ssh key..."
 isGithub=$(ssh -T git@github.com 2>&1)
 echo $isGithub
@@ -88,12 +89,15 @@ https://github.com/settings/keys
 under "new ssh key"'
 show '###   When your done installing git cli ssh key, please press [enter]'
 read -n 1 -s -r -p ""
+  isDone=true
 ;;
 "2")
 show "please follow \n
 https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account"
 show '###   When your done installing git cli ssh key, please press [enter]'
 read -n 1 -s -r -p ""
+  isDone=true
+
 ;;
               *)
                 show "Unknown command line argument $1"
@@ -110,7 +114,8 @@ readGithubUserFromEnv
 readGithubUrl
 checkGitCliSshKey
 
-while [[ $isDone = false ]]
+$isDoneGitConfiguration=false
+while [[ $isDoneGitConfiguration = false ]]
 do
 show "would you like to work with this git configuration:\nemail=$gitemail , user=$gituser"
 show "[1]Yes\n[2]No"
@@ -118,10 +123,13 @@ show "[1]Yes\n[2]No"
 	case $INPSEL in
 	    "1")
       printf "{\n\t\"server\":\"$gitUrl\",\n\t\"gitUser\":\"$gituser\",\n\t\"gitEmail\":\"$gitemail\",\n\t\"devBranch\": \"main\",\n\t\"lockedBranches\":[\"dev\",\"master\",\"main\"]\n}\n" > ${userPath}/settings/git.json
+        $isDoneGitConfiguration=true
+
 			;;
 	    "2")
 	    requestGithubEmail
 	    requestGithubUser
+	    $isDoneGitConfiguration=true
 			;;
 	   *)
      show "Unknown command line argument $1"
@@ -217,8 +225,8 @@ if [ ${#pathAlreadyExists} == 0 ]; then
   show "Adding path to ~/.bashrc"
   echo "" >> ~/.bashrc
   echo "# orchestd" >> ~/.bashrc
-  echo 'export PATH=$PATH:~/orchestD/bin' >> '~/.bashrc'
-  source '~/.bashrc'
+  echo 'export PATH=$PATH:~/orchestD/bin' >> ~/.bashrc
+  source ~/.bashrc
 fi
 
 nohup ./orchestD &
