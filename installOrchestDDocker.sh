@@ -137,8 +137,6 @@ then
    confirmeGitParams
 fi
 
-printf "{\n\t\"server\":\"$gitUrl\",\n\t\"gitUser\":\"$gituser\",\n\t\"gitEmail\":\"$gitemail\",\n\t\"devBranch\": \"main\",\n\t\"lockedBranches\":[\"dev\",\"master\",\"main\"]\n}\n" > ${userPath}/settings/git.json
-
 if [ ! -d "${userPath}" ];
 then
 
