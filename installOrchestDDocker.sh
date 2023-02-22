@@ -59,8 +59,8 @@ function readGithubUserFromEnv {
 function readGithubUrl {
     show "please type the github url you will be working on for this development project:
           (if its youre private github, its probably https://github/${gituser}, if its a company shared github, its probably something like https://github/mycompany)"
-    read -p "> https://github/" resGitUrl
-    gitUrl="https://github/$resGitUrl"
+    read -p "> https://github.com/" resGitUrl
+    gitUrl="https://github.com/$resGitUrl"
 }
 
 function checkGitCliSshKey {
