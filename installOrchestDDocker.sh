@@ -197,11 +197,11 @@ do
 done
 fi
 
-cd $apispecs
+# src folder
     git config user.email $gitemail
-    git config user.name $giteuser
-    checkGitCliSshKey
-cd ..
+    git config user.name $gituser
+    checkGitCliSshKeyk
+
 
 
 cd $origpath
