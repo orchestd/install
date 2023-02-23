@@ -1,12 +1,14 @@
 #!/bin/bash
 
+origpath=$PWD
+
 cd integrations
 ./install.sh
 cd ..
 
 reset;
 
-origpath=$PWD
+userPath=/home/$USER/orchestD
 
 export ORCHESTD_REGISTRY=eu.gcr.io/orchestd-io
 export HEILA_TYPE=HEAD
@@ -28,72 +30,127 @@ function show {
 	echo -e "${fnt}${txt}`tput sgr0`"
 }
 
-function installSshKey() {
-    show " it looks like you dont have git cli ssh key, which is the secured way to connect to github how would you like to proceed ?"
-    show "[1]show me the bash script and I will run it  \n[2]I will do it manually"
+function requestGithubUser {
+      show 'Please type your github user, (how do I find it ? github.com -> top right corner, "Signed in as xxx"):'
+          read -p '> ' gituser
+}
+
+function requestGithubEmail {
+    show 'Please provide the email associated with your github account  (how do I find it ? https://github.com/settings/emails")'
+    
+    read -p "> " gitemail
+}
+
+function requestGithubUrl {
+    show "please type the github url you will be working on for this development project:
+          (if its youre private github, its probably https://github/${gituser}, if its a company shared github, its probably something like https://github/mycompany)"
+    read -p "> https://github.com/" resGitUrl
+    gitUrl="https://github.com/$resGitUrl"
+}
+
+function readGitFromEnv {
+      #show "checking git config user.email..."
+      gitemail=$(git config user.email)
+      #show "checking git config user.name..."
+      gituser=$(git config user.name)
+}
+
+function checkGitCliSshKey {
+  isDone=false
+show "Checking git cli ssh key..."
+isGithub=$(ssh -T -o StrictHostKeyChecking=no git@github.com 2>&1 >/dev/null)
+
+
+#echo "==="
+#echo $isGithub
+#echo "==="
+
+
+
+if [[ $isGithub == *"Permission denied"* ]]; then
+  while [[ $isDone = false ]]
+  do
+show "It looks like you dont have git cli ssh key, which is the secured way to connect to github. how would you like to proceed ?"
+show "[1]Auto create ssh key, and I will copy it to github  \n[2]Take me to github docs that explains how to configure"
+read -p "> " INPSEL
+case $INPSEL in
+"1")
+reset
+ssh-keygen -t ed25519 -N '' -f ~/.ssh/id_ed25519 -C ${gitemail} <<< y
+
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519
+reset
+hash=$(cat ~/.ssh/id_ed25519.pub)
+		
+show "You ssh key is:
+
+${hash}
+
+ Please copy this value to https://github.com/settings/keys
+	under 'new ssh key' "
+show "###   When your done installing git cli ssh key, please press [enter]"
+read -n 1 -s -r -p ""
+  isDone=true
+;;
+"2")
+show "please follow \n
+https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account"
+show '###   When your done installing git cli ssh key, please press [enter]'
+read -n 1 -s -r -p ""
+  isDone=true
+
+;;
+              *)
+                show "Unknown command line argument $1"
+                show "[1] Yes\n[2] No\n"
+               ;;
+esac
+done
+fi
+
+}
+
+function confirmeGitParams {
+    isDoneGitConfiguration=false
+    while [[ $isDoneGitConfiguration = false ]]
+    do
+    show "would you like to work with this git configuration:\n\n     email=$gitemail \n     user=$gituser"
+    show "[1]Yes-Use these setting\n[2]No-I want to use a different email and user"
         read -p "> " INPSEL
     	case $INPSEL in
     	    "1")
-show 'ssh-keygen -t ed25519 -C "xxxx@gmail.com"
-Enter -> Enter (empty passphrase)
-eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/id_ed25519\n
-echo copy this value $(cat ~/.ssh/id_ed25519.pub) to here:
-https://github.com/settings/keys
-under "new ssh key"'
-          show '###   When your done installing git cli ssh key, please press [enter]'
-          read -n 1 -s -r -p ""
+            isDoneGitConfiguration=true
     			;;
     	    "2")
-          show "please follow \n
-          https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account"
-          show '###   When your done installing git cli ssh key, please press [enter]'
-          read -n 1 -s -r -p ""
-
-          ;;
+    	    requestGithubEmail
+    	    requestGithubUser
+    	    isDoneGitConfiguration=true
+    			;;
+    	   *)
+         show "Unknown command line argument $1"
+        ;;
     	esac
+    done
+
 }
 
-#  make sure you have an active git user on either GH or BBKT
-show "checking git config user.email:"
-git config user.email
-if [ $? -ne 0 ]; then
-show "Need to config git  user.email"
-show "Show you how?\n[1]Yes\n[2]No"
-    read -p "> " INPSEL
-	case $INPSEL in
-	    "1")
-            show "https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-email-preferences/setting-your-commit-email-address#setting-your-email-address-for-every-repository-on-your-computer"
-            exit
-			;;
-	    "2")
-            exit
-			;;
-	esac
+readGitFromEnv
+
+if [[ "$gitemail" == "" || "$gituser" == "" ]];
+then
+  	requestGithubEmail
+  	requestGithubUser
+ else
+   confirmeGitParams
 fi
+requestGithubUrl
 
-  isGithub=$(ssh -T git@github.com 2>&1)
-            if [[ $isGithub != *"Permission denied"* ]]; then
-            show " please type your github user (not email), i.e. if your github path is \n
-            https://github.com/leonardo-da-vinci \n
-            please type: \n\n
-            leonardo-da-vinci"
-              read -p '> ' GITUSER
-            else
-              installSshKey
-            fi
-
-GITPATH="https://github.com/$GITUSER"
-
-userPath=/home/$USER/orchestD
 
 if [ ! -d "${userPath}" ];
 then
 
   mkdir -p ${userPath}
-
-  show "log folder"
-  mkdir -p ${userPath}/log
 
   show "create src folder"
   mkdir -p ${userPath}/src
@@ -104,52 +161,61 @@ then
   show "bin folder"
   mkdir ${userPath}/bin
 
+  show "Log folder"
+  mkdir -p ${userPath}/bin/Log
+
 fi
 
-printf "{\n\t\"server\":\"$GITPATH\",\n\t\"devBranch\": \"main\",\n\t\"lockedBranches\":[\"dev\",\"master\",\"main\"]\n}\n" > ${userPath}/settings/git.json
+printf "{\n\t\"server\":\"$gitUrl\",\n\t\"gitUser\":\"$gituser\",\n\t\"gitEmail\":\"$gitemail\",\n\t\"devBranch\": \"main\",\n\t\"lockedBranches\":[\"dev\",\"master\",\"main\"]\n}\n" > ${userPath}/settings/git.json
 
-show "go to src folder"
+#show "go to src folder"
 cd $userPath/src
-pwd
+
+#show "create git env"
+fileGitName=".gitconfig"
+printf "[user]\n" > $fileGitName
+printf "\tname = $gituser\n" >> $fileGitName
+printf "\temail = $gitemail\n\n" >> $fileGitName
+printf '[url "ssh://git@github.com/"]' >> $fileGitName
+printf "\n\tinsteadOf = https://github.com/\n" >> $fileGitName
+
+printf "[includeIf \"gitdir:$userPath/src/\"]\n" >> ~/.gitconfig
+printf "path = $userPath/src/"$fileGitName"\n" >> ~/.gitconfig
+
+
+
+checkGitCliSshKey
 
 isClone=false
 apispecs="apispecs"
 if [ -d "${apispecs}" ];
 then
     show "$apispecs repo exists."
-    cd $apispecs
-    git pull $GITPATH/$apispecs
-
 else
-
 while [[ $isClone = false ]]
 do
-       if git clone $GITPATH/$apispecs 4>&1; then
-          isClone=true
-       else
-                 show "Open this link https://github.com/new?repo_name=$apispecs and create repo"
-                 show "Have you created spispecs repo? \n[1] Yes\n[2] No\n"
-                  read -p "> " ANS
-                  case $ANS in
-            "1")
-                show "ok, let's try again..."
-                        ;;
-            "2")
-            exit
-                        ;;
-        esac
-       fi
+    if git clone $gitUrl/$apispecs 4>&1; then
+    isClone=true
+      else
+    show "Open this link https://github.com/new?repo_name=$apispecs and create repo"
+    show "Please make sure to check the option 'Add a README file'"
+    show '###   When your done create repo, please press [enter]'
+    read -n 1 -s -r -p ""
+    fi
 done
 fi
+
+
 
 cd $origpath
 
 # copy install folder
-mkdir $userPath/bin/install
+mkdir -p $userPath/bin/install
 cp -r docker-compose-orchestd.yml $userPath/bin
 cp -r orchestd.sh $userPath/bin
 cp -r integrations $userPath/bin/integrations
 
+cd $userPath/bin/
 show "###  docker-compose run orchestD  ###"
 docker-compose -f docker-compose-orchestd.yml up -d
 
@@ -158,9 +224,6 @@ if [ ! -d "${settingspath}" ];
 then
   ln -s $userPath/settings $userPath/bin
 fi
-
-
-cd $userPath/bin/
 
 pathAlreadyExists=$(grep '~/orchestD/bin' ~/.bashrc)
 if [ ${#pathAlreadyExists} == 0 ]; then
@@ -175,4 +238,4 @@ nohup ./orchestD &
 
 orchestDUrl=http://127.0.0.1:29000/
 show "Installation successful. click $orchestDUrl to start working"
-xdg-open $orchestDUrl
+xdg-open $orchestDUrl 2> /dev/null
