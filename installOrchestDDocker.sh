@@ -46,6 +46,7 @@ function requestGithubUrl {
           (if its youre private github, its probably https://github/${gituser}, if its a company shared github, its probably something like https://github/mycompany)"
     read -p "> https://github.com/" resGitUrl
     gitUrl="https://github.com/$resGitUrl"
+    gitSsh="git@github.com:$resGitUrl"
 }
 
 function readGitFromEnv {
@@ -68,11 +69,7 @@ show "[1]show me the bash script and I will run it  \n[2]I will do it manually"
 read -p "> " INPSEL
 case $INPSEL in
 "1")
-tempMail=$gitemail
-if [[ $tempMail == "" ]]; then
-tempMail="xxxx@gmail.com"
-fi
-show "ssh-keygen -t ed25519 -C ${tempMail}"
+show "ssh-keygen -t ed25519 -C ${gitemail}"
 show 'Enter -> Enter (empty passphrase)
 eval "$(ssh-agent -s)"
 ssh-add ~/.ssh/id_ed25519\n
@@ -156,7 +153,7 @@ then
 
 fi
 
-printf "{\n\t\"server\":\"$gitUrl\",\n\t\"gitUser\":\"$gituser\",\n\t\"gitEmail\":\"$gitemail\",\n\t\"devBranch\": \"main\",\n\t\"lockedBranches\":[\"dev\",\"master\",\"main\"]\n}\n" > ${userPath}/settings/git.json
+printf "{\n\t\"server\":\"$gitSsh\",\n\t\"gitUser\":\"$gituser\",\n\t\"gitEmail\":\"$gitemail\",\n\t\"devBranch\": \"main\",\n\t\"lockedBranches\":[\"dev\",\"master\",\"main\"]\n}\n" > ${userPath}/settings/git.json
 
 show "go to src folder"
 cd $userPath/src
@@ -168,13 +165,13 @@ if [ -d "${apispecs}" ];
 then
     show "$apispecs repo exists."
     cd $apispecs
-    git pull $gitUrl/$apispecs
+    git pull $gitSsh/$apispecs
 
 else
 
 while [[ $isClone = false ]]
 do
-       if git clone $gitUrl/$apispecs 4>&1; then
+       if git clone $gitSsh/$apispecs 4>&1; then
           isClone=true
        else
                  show "Open this link https://github.com/new?repo_name=$apispecs and create repo"
