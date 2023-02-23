@@ -148,7 +148,7 @@ then
   mkdir ${userPath}/bin
 
   show "log folder"
-  mkdir -p ${userPath}/bit/log
+  mkdir -p ${userPath}/bin/log
 
 fi
 
