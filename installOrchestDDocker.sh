@@ -46,7 +46,6 @@ function requestGithubUrl {
           (if its youre private github, its probably https://github/${gituser}, if its a company shared github, its probably something like https://github/mycompany)"
     read -p "> https://github.com/" resGitUrl
     gitUrl="https://github.com/$resGitUrl"
-    gitSsh="git@github.com:$resGitUrl"
 }
 
 function readGitFromEnv {
@@ -153,7 +152,7 @@ then
 
 fi
 
-printf "{\n\t\"server\":\"$gitSsh\",\n\t\"gitUser\":\"$gituser\",\n\t\"gitEmail\":\"$gitemail\",\n\t\"devBranch\": \"main\",\n\t\"lockedBranches\":[\"dev\",\"master\",\"main\"]\n}\n" > ${userPath}/settings/git.json
+printf "{\n\t\"server\":\"$gitUrl\",\n\t\"gitUser\":\"$gituser\",\n\t\"gitEmail\":\"$gitemail\",\n\t\"devBranch\": \"main\",\n\t\"lockedBranches\":[\"dev\",\"master\",\"main\"]\n}\n" > ${userPath}/settings/git.json
 
 show "go to src folder"
 cd $userPath/src
@@ -165,13 +164,13 @@ if [ -d "${apispecs}" ];
 then
     show "$apispecs repo exists."
     cd $apispecs
-    git pull $gitSsh/$apispecs
+    git pull $gitUrl/$apispecs
 
 else
 
 while [[ $isClone = false ]]
 do
-       if git clone $gitSsh/$apispecs 4>&1; then
+       if git clone $gitUrl/$apispecs 4>&1; then
           isClone=true
        else
                  show "Open this link https://github.com/new?repo_name=$apispecs and create repo"
@@ -197,6 +196,7 @@ fi
 # src folder
     git config user.email $gitemail
     git config user.name $gituser
+    git config --global url."git@github.com:".insteadOf "https://github.com/"
     checkGitCliSshKey
 
 
