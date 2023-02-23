@@ -71,7 +71,7 @@ if [[ $isGithub == *"Permission denied"* ]]; then
   while [[ $isDone = false ]]
   do
 show "It looks like you dont have git cli ssh key, which is the secured way to connect to github. how would you like to proceed ?"
-show "[1]Auto create ssh key, and I will copy it to github  \n[2]Take me to github docs that explains how to configure"
+show "[1] Auto create ssh key, and I will copy it to github  \n[2] Take me to github docs that explains how to configure"
 read -p "> " INPSEL
 case $INPSEL in
 "1")
@@ -116,7 +116,7 @@ function confirmeGitParams {
     while [[ $isDoneGitConfiguration = false ]]
     do
     show "would you like to work with this git configuration:\n\n     email=$gitemail \n     user=$gituser"
-    show "[1]Yes-Use these setting\n[2]No-I want to use a different email and user"
+    show "[1] Yes-Use these setting\n[2] No-I want to use a different email and user"
         read -p "> " INPSEL
     	case $INPSEL in
     	    "1")
@@ -194,11 +194,13 @@ then
 else
 while [[ $isClone = false ]]
 do
-    if git clone $gitUrl/$apispecs 4>&1; then
+    if git clone $gitUrl/$apispecs > /dev/null 2>&1; then
     isClone=true
       else
-    show "Open this link https://github.com/new?repo_name=$apispecs and create repo"
-    show "Please make sure to check the option 'Add a README file'"
+    reset  
+    show "In order to work on a project and keep track on your specs, you need to create an 'apispecs' repo on your github accout"
+    show "*** and make sure to check the option 'Add a README file' ***"
+    show "Please open this link https://github.com/new?repo_name=$apispecs to create repo"
     show '###   When your done create repo, please press [enter]'
     read -n 1 -s -r -p ""
     fi
@@ -235,7 +237,21 @@ if [ ${#pathAlreadyExists} == 0 ]; then
 fi
 
 nohup ./orchestD &
-
+sleep 1
+reset
 orchestDUrl=http://127.0.0.1:29000/
-show "Installation successful. click $orchestDUrl to start working"
+show "Installation successful, and service is not eunning. 
+
+to stop the service
+  orchestd.sh stop
+  
+to start the service
+  orchestd.sh start
+
+to update to latest version
+  orchestd.sh update
+  
+
+browse to $orchestDUrl to begin your journey!"
+
 xdg-open $orchestDUrl 2> /dev/null
