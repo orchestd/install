@@ -11,7 +11,7 @@ In order to run orchestD, have the following installed on your computer:
 * [Docker Engine](https://docs.docker.com/engine/install/)
 * [Docker Compose](https://docs.docker.com/compose/install/)
 * [Goland IDE](https://www.jetbrains.com/go/) or [Visual Studio Code with go plugin](https://learn.microsoft.com/en-us/azure/developer/go/configure-visual-studio-code)
-
+* Notice, while orchestD is running, it will create a lookup server on your local http port (80)
 
 ## GitHub
 
@@ -44,6 +44,12 @@ To start orchestD again
 ```
 orchestd.sh start
 ```
+
+To update orchestD to latest version
+```
+orchestd.sh update
+```
+
 
 ## Happy Coding!
 
