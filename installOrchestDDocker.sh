@@ -58,7 +58,7 @@ function readGitFromEnv {
 function checkGitCliSshKey {
   isDone=false
 show "checking git cli ssh key..."
-isGithub=$(ssh -T git@github.com 2>&1)
+isGithub=$(ssh -T -o StrictHostKeyChecking=no git@github.com 2>&1)
 echo $isGithub
 if [[ $isGithub == *"Permission denied"* ]]; then
   while [[ $isDone = false ]]
