@@ -157,11 +157,17 @@ printf "{\n\t\"server\":\"$gitUrl\",\n\t\"gitUser\":\"$gituser\",\n\t\"gitEmail\
 show "go to src folder"
 cd $userPath/src
 
+show "create git env"
+fileGitName=".gitconfig-orchesdt"
+printf "[user]\n" > $fileGitName
+printf "\tname = $gituser\n" >> $fileGitName
+printf "\temail = $gitemail\n\n" >> $fileGitName
+printf '[url "ssh://git@github.com/"]' >> $fileGitName
+printf "\n\tinsteadOf = https://github.com/\n" >> $fileGitName
 
-git init
-git config user.email $gitemail
-git config user.name $gituser
-git config url."git@github.com:".insteadOf "https://github.com/"
+printf "[includeIf \"gitdir:~$userPath/src/\"]\n" >> ~/.gitconfig
+printf "path = $userPath/src/.gitconfig-orchestd\n" >> ~/.gitconfig
+
 
 isClone=false
 apispecs="apispecs"
