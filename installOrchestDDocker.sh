@@ -6,7 +6,7 @@ origpath=$PWD
 startId=$(date +%s)
 d=$(date '+%Y-%m-%d-%H:%M:%S')
 event='{"eventType":"start","eventsData":{"Len":"'${startId}'","Checksum":"0"},"session":"install","timestamp":"'${d}'"}'
-curl -X POST "https://stats.orchestd.io/stats" -d "${event}" > /dev/null
+curl -X POST "https://stats.orchestd.io/stats" -d "${event}" > /dev/null 2>&1
 
 
 cd integrations
@@ -257,7 +257,7 @@ nohup ./orchestD &
 sleep 1
 reset
 orchestDUrl=http://127.0.0.1:29000/
-show "Installation successful, and service is not eunning. 
+show "Installation successful, and service is now running. 
 
 to stop the service
   orchestd.sh stop
@@ -275,7 +275,7 @@ browse to $orchestDUrl to begin your journey!"
 #report installation end
 d=$(date '+%Y-%m-%d-%H:%M:%S')
 event='{"eventType":"end","eventsData":{"Len":"'${startId}'","Checksum":"0"},"session":"install","timestamp":"'${d}'"}'
-curl -X POST "https://stats.orchestd.io/stats" -d "${event}" > /dev/null
+curl -X POST "https://stats.orchestd.io/stats" -d "${event}" > /dev/null 2>&1
 
 
 
