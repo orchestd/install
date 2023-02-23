@@ -200,7 +200,7 @@ fi
 # src folder
     git config user.email $gitemail
     git config user.name $gituser
-    checkGitCliSshKeyk
+    checkGitCliSshKey
 
 
 
