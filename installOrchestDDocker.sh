@@ -158,7 +158,7 @@ show "go to src folder"
 cd $userPath/src
 
 show "create git env"
-fileGitName=".gitconfig-orchesdt"
+fileGitName=".gitconfig"
 printf "[user]\n" > $fileGitName
 printf "\tname = $gituser\n" >> $fileGitName
 printf "\temail = $gitemail\n\n" >> $fileGitName
@@ -166,7 +166,7 @@ printf '[url "ssh://git@github.com/"]' >> $fileGitName
 printf "\n\tinsteadOf = https://github.com/\n" >> $fileGitName
 
 printf "[includeIf \"gitdir:~$userPath/src/\"]\n" >> ~/.gitconfig
-printf "path = $userPath/src/.gitconfig-orchestd\n" >> ~/.gitconfig
+printf "path = $userPath/src/"fileGitName"\n" >> ~/.gitconfig
 
 
 isClone=false
