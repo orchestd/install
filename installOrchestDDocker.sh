@@ -2,6 +2,13 @@
 
 origpath=$PWD
 
+#report installation start
+startId=$(date +%s)
+d=$(date '+%Y-%m-%d-%H:%M:%S')
+event='{"eventType":"start","eventsData":{"Len":"'${startId}'","Checksum":"0"},"session":"install","timestamp":"'${d}'"}'
+curl -X POST "https://stats.orchestd.io/stats" -d "${event}" > /dev/null
+
+
 cd integrations
 ./install.sh
 cd ..
@@ -195,6 +202,16 @@ else
 while [[ $isClone = false ]]
 do
     if git clone $gitUrl/$apispecs > /dev/null 2>&1; then
+    	cd $apispecs
+    	README="README.md"
+    	if [ ! -f "${README}" ]; then
+    	   echo "apispecs" > $README
+    	   git add .
+    	   git commit -m "initial commit"
+    	   git push
+    	fi
+
+
     isClone=true
       else
     reset  
@@ -253,5 +270,13 @@ to update to latest version
   
 
 browse to $orchestDUrl to begin your journey!"
+
+
+#report installation end
+d=$(date '+%Y-%m-%d-%H:%M:%S')
+event='{"eventType":"end","eventsData":{"Len":"'${startId}'","Checksum":"0"},"session":"install","timestamp":"'${d}'"}'
+curl -X POST "https://stats.orchestd.io/stats" -d "${event}" > /dev/null
+
+
 
 xdg-open $orchestDUrl 2> /dev/null
