@@ -175,6 +175,7 @@ do
 done
 fi
 
+git init
 git config user.email $gitemail
 git config user.name $gituser
 git config url."git@github.com:".insteadOf "https://github.com/"
