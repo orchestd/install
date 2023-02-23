@@ -19,7 +19,7 @@ function show {
 
 
 # Instal Docker
-show "cheking Docker.."
+show "checking Docker.."
 docker -v
 if [ $? -ne 0 ]; then
 show "Need to install Docker"
@@ -63,8 +63,8 @@ show "done"
 show "MongoDB"
 ls /etc/apt/sources.list.d | grep mongodb-org-
 if [ $? -ne 0 ]; then
-show "Need to install MongoDB"
-show "do you want install?\n[1]Yes\n[2]No"
+show "orchestd uses MongoDB for caching"
+show "do you want install MongoDB?\n[1]Yes\n[2]No"
     read -p "> " INPSEL
 	case $INPSEL in
 	    "1")
