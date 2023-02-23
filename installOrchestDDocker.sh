@@ -157,6 +157,12 @@ printf "{\n\t\"server\":\"$gitUrl\",\n\t\"gitUser\":\"$gituser\",\n\t\"gitEmail\
 show "go to src folder"
 cd $userPath/src
 
+
+git init
+git config user.email $gitemail
+git config user.name $gituser
+git config url."git@github.com:".insteadOf "https://github.com/"
+
 isClone=false
 apispecs="apispecs"
 if [ -d "${apispecs}" ];
@@ -175,10 +181,6 @@ do
 done
 fi
 
-git init
-git config user.email $gitemail
-git config user.name $gituser
-git config url."git@github.com:".insteadOf "https://github.com/"
 checkGitCliSshKey
 
 cd $origpath
