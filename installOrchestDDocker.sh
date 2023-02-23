@@ -31,7 +31,7 @@ function show {
 }
 
 function requestGithubUser {
-      show 'please type your github user, (github -> top right corner, "Signed in as xxx"):'
+      show 'please type your github user, (how do I find it ? github.com -> top right corner, "Signed in as xxx"):'
           read -p '> ' gituser
 }
 
@@ -121,7 +121,7 @@ function confirmeGitParams {
 
 }
 
-    readGitFromEnv
+readGitFromEnv
 
 if [[ "$gitemail" == "" || "$gituser" == "" ]];
 then
@@ -138,9 +138,6 @@ then
 
   mkdir -p ${userPath}
 
-  show "log folder"
-  mkdir -p ${userPath}/log
-
   show "create src folder"
   mkdir -p ${userPath}/src
 
@@ -150,56 +147,38 @@ then
   show "bin folder"
   mkdir ${userPath}/bin
 
+  show "log folder"
+  mkdir -p ${userPath}/bit/log
+
 fi
 
 printf "{\n\t\"server\":\"$gitUrl\",\n\t\"gitUser\":\"$gituser\",\n\t\"gitEmail\":\"$gitemail\",\n\t\"devBranch\": \"main\",\n\t\"lockedBranches\":[\"dev\",\"master\",\"main\"]\n}\n" > ${userPath}/settings/git.json
 
 show "go to src folder"
 cd $userPath/src
-pwd
 
 isClone=false
 apispecs="apispecs"
 if [ -d "${apispecs}" ];
 then
     show "$apispecs repo exists."
-    cd $apispecs
-    git pull $gitUrl/$apispecs
-
 else
-
 while [[ $isClone = false ]]
 do
-       if git clone $gitUrl/$apispecs 4>&1; then
-          isClone=true
-       else
-                 show "Open this link https://github.com/new?repo_name=$apispecs and create repo"
-                 show "Have you created spispecs repo? \n[1] Yes\n[2] No\n"
-                  read -p "> " ANS
-                  case $ANS in
-            "1")
-                show "ok, let's try again..."
-                        ;;
-            "2")
-            show '###   When your done create repo, please press [enter]'
-              read -n 1 -s -r -p ""
-                        ;;
-              *)
-                show "Unknown command line argument $1"
-                show "[1] Yes\n[2] No\n"
-               ;;
-        esac
-       fi
+    if git clone $gitUrl/$apispecs 4>&1; then
+    isClone=true
+      else
+    show "Open this link https://github.com/new?repo_name=$apispecs and create repo"
+    show '###   When your done create repo, please press [enter]'
+    read -n 1 -s -r -p ""
+    fi
 done
 fi
 
-# src folder
-    git config user.email $gitemail
-    git config user.name $gituser
-    git config --global url."git@github.com:".insteadOf "https://github.com/"
-    checkGitCliSshKey
-
-
+git config user.email $gitemail
+git config user.name $gituser
+git config url."git@github.com:".insteadOf "https://github.com/"
+checkGitCliSshKey
 
 cd $origpath
 
@@ -209,17 +188,15 @@ cp -r docker-compose-orchestd.yml $userPath/bin
 cp -r orchestd.sh $userPath/bin
 cp -r integrations $userPath/bin/integrations
 
+cd $userPath/bin/
 show "###  docker-compose run orchestD  ###"
-docker-compose -f $userPath/bin/docker-compose-orchestd.yml up -d
-
+docker-compose -f docker-compose-orchestd.yml up -d
 
 settingspath=$userPath/bin/settings
 if [ ! -d "${settingspath}" ];
 then
   ln -s $userPath/settings $userPath/bin
 fi
-
-cd $userPath/bin/
 
 pathAlreadyExists=$(grep '~/orchestD/bin' ~/.bashrc)
 if [ ${#pathAlreadyExists} == 0 ]; then
@@ -234,4 +211,4 @@ nohup ./orchestD &
 
 orchestDUrl=http://127.0.0.1:29000/
 show "Installation successful. click $orchestDUrl to start working"
-xdg-open $orchestDUrl
+xdg-open $orchestDUrl 2> /dev/null
