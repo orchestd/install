@@ -112,7 +112,8 @@ read -p "> " INPSEL
 case $INPSEL in
 "1")
 reset
-ssh-keygen -t ed25519 -N '' -f ~/.ssh/id_ed25519 -C ${gitemail} <<< y
+
+ssh-keygen -t ed25519 -N '' -f ~/.ssh/orchestD -C ${gitemail} <<< y
 
 eval "$(ssh-agent -s)"
 ssh-add ~/.ssh/id_ed25519
