@@ -60,47 +60,6 @@ function readGitFromEnv {
       gituser=$(git config user.name)
 }
 
-function checkGitCliSshKey {
-  isDone=false
-show "checking git cli ssh key..."
-isGithub=$(ssh -T -o StrictHostKeyChecking=no git@github.com 2>&1)
-echo $isGithub
-if [[ $isGithub == *"Permission denied"* ]]; then
-  while [[ $isDone = false ]]
-  do
-show " it looks like you dont have git cli ssh key, which is the secured way to connect to github how would you like to proceed ?"
-show "[1]show me the bash script and I will run it  \n[2]I will do it manually"
-read -p "> " INPSEL
-case $INPSEL in
-"1")
-show "ssh-keygen -t ed25519 -C ${gitemail}"
-show 'Enter -> Enter (empty passphrase)
-eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/id_ed25519\n
-echo copy this value $(cat ~/.ssh/id_ed25519.pub) to here:
-https://github.com/settings/keys
-under "new ssh key"'
-show '###   When your done installing git cli ssh key, please press [enter]'
-read -n 1 -s -r -p ""
-  isDone=true
-;;
-"2")
-show "please follow \n
-https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account"
-show '###   When your done installing git cli ssh key, please press [enter]'
-read -n 1 -s -r -p ""
-  isDone=true
-
-;;
-              *)
-                show "Unknown command line argument $1"
-                show "[1] Yes\n[2] No\n"
-               ;;
-esac
-done
-fi
-
-}
 
 function ShowDocHowAddNewSShKey {
 isDone=false
@@ -120,7 +79,7 @@ ssh-add ~/.ssh/orchestD
 reset
 hash=$(cat ~/.ssh/orchestD.pub)
 
-show "You ssh key is:\n
+show "Your ssh key is:\n
 ${hash}\n
  Please copy this value to https://github.com/settings/keys
 	under 'new ssh key' "
@@ -154,8 +113,8 @@ function confirmeGitParams {
     isDoneGitConfiguration=false
     while [[ $isDoneGitConfiguration = false ]]
     do
-    show "would you like to work with this git configuration:\nemail=$gitemail , user=$gituser"
-    show "[1]Yes\n[2]No"
+    show "would you like to work with this git configuration:\n\n     email=$gitemail \n     user=$gituser"
+    show "[1] Yes-Use these setting\n[2] No-I want to use a different email and user"
         read -p "> " INPSEL
     	case $INPSEL in
     	    "1")
@@ -199,17 +158,17 @@ then
   show "bin folder"
   mkdir ${userPath}/bin
 
-  show "log folder"
-  mkdir -p ${userPath}/bin/log
+  show "Log folder"
+  mkdir -p ${userPath}/bin/Log
 
 fi
 
 printf "{\n\t\"server\":\"$gitUrl\",\n\t\"gitUser\":\"$gituser\",\n\t\"gitEmail\":\"$gitemail\",\n\t\"devBranch\": \"main\",\n\t\"lockedBranches\":[\"dev\",\"master\",\"main\"]\n}\n" > ${userPath}/settings/git.json
 
-show "go to src folder"
+#show "go to src folder"
 cd $userPath/src
 
-show "create git env"
+#show "create git env"
 fileGitName=".gitconfig"
 printf "[user]\n" > $fileGitName
 printf "\tname = $gituser\n" >> $fileGitName
@@ -283,7 +242,8 @@ nohup ./orchestD &
 sleep 1
 reset
 orchestDUrl=http://127.0.0.1:29000/
-show 'Installation successful, and service is now running.
+show "Installation successful, and service is now running.
+
 to stop the service
   orchestd.sh stop
 
@@ -292,7 +252,8 @@ to start the service
 to update to latest version
   orchestd.sh update
 
-browse to $orchestDUrl to begin your journey!'
+
+browse to $orchestDUrl to begin your journey!"
 
 
 #report installation end
