@@ -97,6 +97,49 @@ fi
 
 }
 
+function ShowDocHowAddNewSShKey {
+isDone=false
+while [[ $isDone = false ]]
+do
+show " it looks like you dont have git ssh key for $gitemail, which is the secured way to connect to github \nhow would you like to proceed ?"
+show "[1]show me the bash script and I will run it  \n[2]I will do it manually"
+read -p "> " INPSEL
+case $INPSEL in
+"1")
+show "ssh-keygen -t ed25519 -C ${gitemail}"
+show 'Enter -> Enter (empty passphrase)
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519\n
+echo copy this value $(cat ~/.ssh/id_ed25519.pub) to here:
+https://github.com/settings/keys
+under "new ssh key"'
+show '###   When your done installing git cli ssh key, please press [enter]'
+read -n 1 -s -r -p ""
+  isDone=true
+;;
+"2")
+show "please follow \n
+https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account"
+show '###   When your done installing git cli ssh key, please press [enter]'
+read -n 1 -s -r -p ""
+  isDone=true
+
+;;
+              *)
+                show "Unknown command line argument $1"
+                show "[1] Yes\n[2] No\n"
+               ;;
+esac
+done
+}
+
+function checkSSHKeyGitHubEmail {
+isEmail=$(cat ~/.ssh/* | grep $gitemail)
+if [[ "$isEmail" == "" ]]; then
+ShowDocHowAddNewSShKey
+fi
+}
+
 function confirmeGitParams {
     isDoneGitConfiguration=false
     while [[ $isDoneGitConfiguration = false ]]
@@ -187,7 +230,7 @@ do
 done
 fi
 
-checkGitCliSshKey
+checkSSHKeyGitHubEmail
 
 cd $origpath
 
