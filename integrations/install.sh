@@ -21,7 +21,7 @@ function show {
 function goPrerequisites {
     which go
     if [ $? -ne 0 ]; then
-    show "Need to install Go"
+    show "orchestd uses Go"
     exit
     fi
 
@@ -36,7 +36,7 @@ function goPrerequisites {
 function gitPrerequisites {
         which git
         if [ $? -ne 0 ]; then
-        show "Need to install Git"
+        show "orchestd uses Git"
         exit
         fi
 }
@@ -44,7 +44,7 @@ function gitPrerequisites {
 function dockerPrerequisites {
       which docker
       if [ $? -ne 0 ]; then
-      show "Need to install Docker"
+      show "orchestd uses Docker"
       exit
       fi
 
@@ -54,7 +54,7 @@ function dockerPrerequisites {
 function dockerComposePrerequisites {
       which docker-compose
       if [ $? -ne 0 ]; then
-      show "Need to install docker-compose"
+      show "orchestd uses docker-compose"
       exit
       fi
 
@@ -64,14 +64,10 @@ function dockerComposePrerequisites {
 function mongoDBPrerequisites {
       which mongo
       if [ $? -ne 0 ]; then
-      show "Need to install mongo shell"
+      show "orchestd uses MongoDB for caching"
       exit
       fi
       mongo -version
-      if [ $? -ne 0 ]; then
-      show "Need to install mongo shell"
-      exit
-      fi
 }
 
 goPrerequisites

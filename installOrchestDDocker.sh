@@ -2,6 +2,12 @@
 
 origpath=$PWD
 
+#report installation start
+startId=$(date +%s)
+d=$(date '+%Y-%m-%d-%H:%M:%S')
+event='{"eventType":"start","eventsData":{"Len":"'${startId}'","Checksum":"0"},"session":"install","timestamp":"'${d}'"}'
+curl -X POST "https://stats.orchestd.io/stats" -d "${event}" > /dev/null 2>&1
+
 cd integrations
 ./install.sh
 cd ..
@@ -31,14 +37,13 @@ function show {
 }
 
 function requestGithubUser {
-      show 'please type your github user, (how do I find it ? github.com -> top right corner, "Signed in as xxx"):'
+      show 'Please type your github user, (how do I find it ? github.com -> top right corner, "Signed in as xxx"):'
           read -p '> ' gituser
 }
 
 function requestGithubEmail {
-    show "please type your github email, e.g. mymail@gmail.com / mymail@mycompany.com :"
-    show "how do I find it ? https://github.com/settings/emails"
-        read -p "> " gitemail
+    show 'Please provide the email associated with your github account  (how do I find it ? https://github.com/settings/emails")'
+    read -p "> " gitemail
 }
 
 function requestGithubUrl {
@@ -49,9 +54,9 @@ function requestGithubUrl {
 }
 
 function readGitFromEnv {
-      show "checking git config user.email..."
+      #show "checking git config user.email..."
       gitemail=$(git config user.email)
-      show "checking git config user.name..."
+      #show "checking git config user.name..."
       gituser=$(git config user.name)
 }
 
@@ -101,19 +106,24 @@ function ShowDocHowAddNewSShKey {
 isDone=false
 while [[ $isDone = false ]]
 do
-show " it looks like you dont have git ssh key for $gitemail, which is the secured way to connect to github \nhow would you like to proceed ?"
-show "[1]show me the bash script and I will run it  \n[2]I will do it manually"
+show "It looks like you dont have git cli ssh key, which is the secured way to connect to github. how would you like to proceed ?"
+show "[1] Auto create ssh key, and I will copy it to github  \n[2] Take me to github docs that explains how to configure"
 read -p "> " INPSEL
 case $INPSEL in
 "1")
-show "ssh-keygen -t ed25519 -C ${gitemail}"
-show 'Enter -> Enter (empty passphrase)
+reset
+ssh-keygen -t ed25519 -N '' -f ~/.ssh/id_ed25519 -C ${gitemail} <<< y
+
 eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/id_ed25519\n
-echo copy this value $(cat ~/.ssh/id_ed25519.pub) to here:
-https://github.com/settings/keys
-under "new ssh key"'
-show '###   When your done installing git cli ssh key, please press [enter]'
+ssh-add ~/.ssh/id_ed25519
+reset
+hash=$(cat ~/.ssh/id_ed25519.pub)
+
+show "You ssh key is:\n
+${hash}\n
+ Please copy this value to https://github.com/settings/keys
+	under 'new ssh key' "
+show "###   When your done installing git cli ssh key, please press [enter]"
 read -n 1 -s -r -p ""
   isDone=true
 ;;
@@ -123,12 +133,11 @@ https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a
 show '###   When your done installing git cli ssh key, please press [enter]'
 read -n 1 -s -r -p ""
   isDone=true
-
 ;;
-              *)
-                show "Unknown command line argument $1"
-                show "[1] Yes\n[2] No\n"
-               ;;
+*)
+show "Unknown command line argument $1"
+show "[1] Yes\n[2] No\n"
+;;
 esac
 done
 }
@@ -161,7 +170,6 @@ function confirmeGitParams {
         ;;
     	esac
     done
-
 }
 
 readGitFromEnv
@@ -220,10 +228,21 @@ then
 else
 while [[ $isClone = false ]]
 do
-    if git clone $gitUrl/$apispecs 4>&1; then
+    if git clone $gitUrl/$apispecs > /dev/null 2>&1; then
+    	cd $apispecs
+    	README="README.md"
+    	if [ ! -f "${README}" ]; then
+    	   echo "apispecs" > $README
+    	   git add .
+    	   git commit -m "initial commit"
+    	   git push
+    	fi
     isClone=true
       else
-    show "Open this link https://github.com/new?repo_name=$apispecs and create repo"
+    reset
+    show "In order to work on a project and keep track on your specs, you need to create an 'apispecs' repo on your github accout"
+    show "*** and make sure to check the option 'Add a README file' ***"
+    show "Please open this link https://github.com/new?repo_name=$apispecs to create repo"
     show '###   When your done create repo, please press [enter]'
     read -n 1 -s -r -p ""
     fi
@@ -260,7 +279,24 @@ if [ ${#pathAlreadyExists} == 0 ]; then
 fi
 
 nohup ./orchestD &
-
+sleep 1
+reset
 orchestDUrl=http://127.0.0.1:29000/
-show "Installation successful. click $orchestDUrl to start working"
+show 'Installation successful, and service is now running.
+to stop the service
+  orchestd.sh stop
+
+to start the service
+  orchestd.sh start
+to update to latest version
+  orchestd.sh update
+
+browse to $orchestDUrl to begin your journey!'
+
+
+#report installation end
+d=$(date '+%Y-%m-%d-%H:%M:%S')
+event='{"eventType":"end","eventsData":{"Len":"'${startId}'","Checksum":"0"},"session":"install","timestamp":"'${d}'"}'
+curl -X POST "https://stats.orchestd.io/stats" -d "${event}" > /dev/null 2>&1
+
 xdg-open $orchestDUrl 2> /dev/null
