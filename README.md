@@ -1,5 +1,5 @@
-# orchestD Installation and Usage Manual
-This manual describes installation and usage of orchestD.
+# orchestD Installation and Manual
+This manual describes installation and basic operation of orchestD.
 
 ## Prerequisites 
 
