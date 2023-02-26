@@ -21,7 +21,7 @@ function show {
 function goPrerequisites {
     which go
     if [ $? -ne 0 ]; then
-    show "orchestd uses Go \nhttps://go.dev/doc/install"
+    show "please install golang\nhttps://go.dev/doc/install"
     exit
     fi
 
