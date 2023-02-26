@@ -116,9 +116,9 @@ reset
 ssh-keygen -t ed25519 -N '' -f ~/.ssh/orchestD -C ${gitemail} <<< y
 
 eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/id_ed25519
+ssh-add ~/.ssh/orchestD
 reset
-hash=$(cat ~/.ssh/id_ed25519.pub)
+hash=$(cat ~/.ssh/orchestD.pub)
 
 show "You ssh key is:\n
 ${hash}\n
