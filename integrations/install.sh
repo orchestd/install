@@ -65,7 +65,6 @@ function mongoDBPrerequisites {
       which mongo
       if [ $? -ne 0 ]; then
       show "For best experience, we advise you also install Mongo db tools\n   https://www.mongodb.com/docs/mongodb-shell/install/"
-      exit
       fi
       mongo -version
 }
