@@ -21,14 +21,14 @@ function show {
 function goPrerequisites {
     which go
     if [ $? -ne 0 ]; then
-    show "please install golang\nhttps://go.dev/doc/install"
+    show "Please install golang\n   https://go.dev/doc/install"
     exit
     fi
 
     goV=`go version | { read _ _ v _; echo ${v#go}; }`
     echo $goV
     if [[ "$goV" < "1.19.0" ]]; then
-      echo "minimum supported version of golang is 1.19\nhttps://go.dev/doc/install"
+      echo "Minimum supported version of golang is 1.19, Please update\nhttps://go.dev/doc/install"
       exit
     fi
 }
@@ -36,7 +36,7 @@ function goPrerequisites {
 function gitPrerequisites {
         which git
         if [ $? -ne 0 ]; then
-        show "Please install git\nhttps://git-scm.com/downloads"
+        show "Please install git\n   https://git-scm.com/downloads"
         exit
         fi
 }
@@ -44,7 +44,7 @@ function gitPrerequisites {
 function dockerPrerequisites {
       which docker
       if [ $? -ne 0 ]; then
-      show "orchestd uses Docker"
+      show "Please install Docker\n   https://docs.docker.com/engine/install/"
       exit
       fi
 
@@ -54,7 +54,7 @@ function dockerPrerequisites {
 function dockerComposePrerequisites {
       which docker-compose
       if [ $? -ne 0 ]; then
-      show "orchestd uses docker-compose"
+      show "Please install Docker compose\n   https://docs.docker.com/compose/install/"
       exit
       fi
 
@@ -64,7 +64,8 @@ function dockerComposePrerequisites {
 function mongoDBPrerequisites {
       which mongo
       if [ $? -ne 0 ]; then
-      show "for best experience, we advise you also install Mongo db tools\nhttps://www.mongodb.com/docs/mongodb-shell/install/"
+      show "For best experience, we advise you also install Mongo db tools\n   https://www.mongodb.com/docs/mongodb-shell/install/"
+      exit
       fi
       mongo -version
 }
