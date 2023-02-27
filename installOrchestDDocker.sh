@@ -79,6 +79,11 @@ ssh-add ~/.ssh/orchestD
 reset
 hash=$(cat ~/.ssh/orchestD.pub)
 
+echo "Host orchestd.github.com
+  Hostname github.com
+  PreferredAuthentications publickey
+  IdentityFile ~/.ssh/orchestd" > config
+
 show "Your ssh key is:\n
 ${hash}\n
  Please copy this value to https://github.com/settings/keys
