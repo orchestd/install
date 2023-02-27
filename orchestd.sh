@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd ~/orchestD/bin
+cd ~/orchestd/bin
 
 export ORCHESTD_REGISTRY=eu.gcr.io/orchestd-io
 export HEILA_TYPE=HEAD
@@ -18,7 +18,7 @@ if [[ ${1} == 'start' ]]; then
 elif [[ ${1} == 'stop' ]]; then
   docker-compose -f integrations/docker-compose.yml $1
   docker-compose -f docker-compose-orchestd.yml $1
-  killall -e orchestD
+  killall -e orchestd
 elif [[ ${1} == 'update' ]]; then
   export TAG=latest
 
