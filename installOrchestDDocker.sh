@@ -14,14 +14,14 @@ cd ..
 
 reset;
 
-userPath=/home/$USER/orchestD
+userPath=/home/$USER/orchestd
 
 export ORCHESTD_REGISTRY=eu.gcr.io/orchestd-io
 export HEILA_TYPE=HEAD
 export HEILA_ENV=LOCAL
 export GIN_MODE=release
-export TAG=lastmerge
-export DOCKER_NAME=orchestD
+export TAG=latest
+export DOCKER_NAME=orchestd
 
 function show {
 	if [ "$1" == "-e" ]
@@ -72,12 +72,12 @@ case $INPSEL in
 "1")
 reset
 
-ssh-keygen -t ed25519 -N '' -f ~/.ssh/orchestD -C ${gitemail} <<< y
+ssh-keygen -t ed25519 -N '' -f ~/.ssh/orchestd -C ${gitemail} <<< y
 
 eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/orchestD
+ssh-add ~/.ssh/orchestd
 reset
-hash=$(cat ~/.ssh/orchestD.pub)
+hash=$(cat ~/.ssh/orchestd.pub)
 
 echo "Host orchestd.github.com
   Hostname github.com
@@ -234,12 +234,12 @@ then
   ln -s $userPath/settings $userPath/bin
 fi
 
-pathAlreadyExists=$(grep '~/orchestD/bin' ~/.bashrc)
+pathAlreadyExists=$(grep '~/orchestd/bin' ~/.bashrc)
 if [ ${#pathAlreadyExists} == 0 ]; then
   show "Adding path to ~/.bashrc"
   echo "" >> ~/.bashrc
   echo "# orchestd" >> ~/.bashrc
-  echo 'export PATH=$PATH:~/orchestD/bin' >> ~/.bashrc
+  echo 'export PATH=$PATH:~/orchestd/bin' >> ~/.bashrc
   source ~/.bashrc
 fi
 
