@@ -243,7 +243,7 @@ if [ ${#pathAlreadyExists} == 0 ]; then
   source ~/.bashrc
 fi
 
-nohup ./orchestD &
+nohup ./devplatform &
 sleep 1
 reset
 orchestDUrl=http://127.0.0.1:29000/
