@@ -1,5 +1,5 @@
-# orchestD Installation and Usage Manual
-This manual describes installation and usage of orchestD.
+# orchestD Installation and Manual
+This manual describes installation and basic operation of orchestD.
 
 ## Prerequisites 
 
@@ -10,8 +10,10 @@ In order to run orchestD, have the following installed on your computer:
 * [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [Docker Engine](https://docs.docker.com/engine/install/)
 * [Docker Compose](https://docs.docker.com/compose/install/)
-* [Goland IDE](https://www.jetbrains.com/go/) or [Visual Studio Code with go plugin](https://learn.microsoft.com/en-us/azure/developer/go/configure-visual-studio-code)
+* Recommended - [Goland IDE](https://www.jetbrains.com/go/) or [Visual Studio Code with go plugin](https://learn.microsoft.com/en-us/azure/developer/go/configure-visual-studio-code)
+* Optional - [Mongo client tools](https://www.mongodb.com/docs/database-tools/installation/installation-linux/) - If you want to use cache storage
 
+Notice, while orchestD is running, it will create a lookup server on your local http port (80)
 
 ## GitHub
 
@@ -44,6 +46,12 @@ To start orchestD again
 ```
 orchestd.sh start
 ```
+
+To update orchestD to latest version
+```
+orchestd.sh update
+```
+
 
 ## Happy Coding!
 
