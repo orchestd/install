@@ -8,21 +8,20 @@ d=$(date '+%Y-%m-%d-%H:%M:%S')
 event='{"eventType":"start","eventsData":{"Len":"'${startId}'","Checksum":"0"},"session":"install","timestamp":"'${d}'"}'
 curl -X POST "https://stats.orchestd.io/stats" -d "${event}" > /dev/null 2>&1
 
-
 cd integrations
 ./install.sh
 cd ..
 
 reset;
 
-userPath=/home/$USER/orchestD
+userPath=/home/$USER/orchestd
 
 export ORCHESTD_REGISTRY=eu.gcr.io/orchestd-io
 export HEILA_TYPE=HEAD
 export HEILA_ENV=LOCAL
 export GIN_MODE=release
-export TAG=lastmerge
-export DOCKER_NAME=orchestD
+export TAG=latest
+export DOCKER_NAME=orchestd
 
 function show {
 	if [ "$1" == "-e" ]
@@ -44,7 +43,6 @@ function requestGithubUser {
 
 function requestGithubEmail {
     show 'Please provide the email associated with your github account  (how do I find it ? https://github.com/settings/emails")'
-    
     read -p "> " gitemail
 }
 
@@ -62,38 +60,32 @@ function readGitFromEnv {
       gituser=$(git config user.name)
 }
 
-function checkGitCliSshKey {
-  isDone=false
-show "Checking git cli ssh key..."
-isGithub=$(ssh -T -o StrictHostKeyChecking=no git@github.com 2>&1 >/dev/null)
 
-
-#echo "==="
-#echo $isGithub
-#echo "==="
-
-
-
-if [[ $isGithub == *"Permission denied"* ]]; then
-  while [[ $isDone = false ]]
-  do
+function ShowDocHowAddNewSShKey {
+isDone=false
+while [[ $isDone = false ]]
+do
 show "It looks like you dont have git cli ssh key, which is the secured way to connect to github. how would you like to proceed ?"
 show "[1] Auto create ssh key, and I will copy it to github  \n[2] Take me to github docs that explains how to configure"
 read -p "> " INPSEL
 case $INPSEL in
 "1")
 reset
-ssh-keygen -t ed25519 -N '' -f ~/.ssh/id_ed25519 -C ${gitemail} <<< y
+
+ssh-keygen -t ed25519 -N '' -f ~/.ssh/orchestd -C ${gitemail} <<< y
 
 eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/id_ed25519
+ssh-add ~/.ssh/orchestd
 reset
-hash=$(cat ~/.ssh/id_ed25519.pub)
-		
-show "You ssh key is:
+hash=$(cat ~/.ssh/orchestd.pub)
 
-${hash}
+echo "Host orchestd.github.com
+  Hostname github.com
+  PreferredAuthentications publickey
+  IdentityFile ~/.ssh/orchestd" > config
 
+show "Your ssh key is:\n
+${hash}\n
  Please copy this value to https://github.com/settings/keys
 	under 'new ssh key' "
 show "###   When your done installing git cli ssh key, please press [enter]"
@@ -106,16 +98,20 @@ https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a
 show '###   When your done installing git cli ssh key, please press [enter]'
 read -n 1 -s -r -p ""
   isDone=true
-
 ;;
-              *)
-                show "Unknown command line argument $1"
-                show "[1] Yes\n[2] No\n"
-               ;;
+*)
+show "Unknown command line argument $1"
+show "[1] Yes\n[2] No\n"
+;;
 esac
 done
-fi
+}
 
+function checkSSHKeyGitHubEmail {
+isEmail=$(cat ~/.ssh/* | grep $gitemail)
+if [[ "$isEmail" == "" ]]; then
+ShowDocHowAddNewSShKey
+fi
 }
 
 function confirmeGitParams {
@@ -139,7 +135,6 @@ function confirmeGitParams {
         ;;
     	esac
     done
-
 }
 
 readGitFromEnv
@@ -190,9 +185,6 @@ printf "[includeIf \"gitdir:$userPath/src/\"]\n" >> ~/.gitconfig
 printf "path = $userPath/src/"$fileGitName"\n" >> ~/.gitconfig
 
 
-
-checkGitCliSshKey
-
 isClone=false
 apispecs="apispecs"
 if [ -d "${apispecs}" ];
@@ -210,11 +202,9 @@ do
     	   git commit -m "initial commit"
     	   git push
     	fi
-
-
     isClone=true
       else
-    reset  
+    reset
     show "In order to work on a project and keep track on your specs, you need to create an 'apispecs' repo on your github accout"
     show "*** and make sure to check the option 'Add a README file' ***"
     show "Please open this link https://github.com/new?repo_name=$apispecs to create repo"
@@ -224,7 +214,7 @@ do
 done
 fi
 
-
+checkSSHKeyGitHubEmail
 
 cd $origpath
 
@@ -244,30 +234,29 @@ then
   ln -s $userPath/settings $userPath/bin
 fi
 
-pathAlreadyExists=$(grep '~/orchestD/bin' ~/.bashrc)
+pathAlreadyExists=$(grep '~/orchestd/bin' ~/.bashrc)
 if [ ${#pathAlreadyExists} == 0 ]; then
   show "Adding path to ~/.bashrc"
   echo "" >> ~/.bashrc
   echo "# orchestd" >> ~/.bashrc
-  echo 'export PATH=$PATH:~/orchestD/bin' >> ~/.bashrc
+  echo 'export PATH=$PATH:~/orchestd/bin' >> ~/.bashrc
   source ~/.bashrc
 fi
 
-nohup ./orchestD &
+nohup ./devplatform &
 sleep 1
 reset
 orchestDUrl=http://127.0.0.1:29000/
-show "Installation successful, and service is now running. 
+show "Installation successful, and service is now running.
 
 to stop the service
   orchestd.sh stop
-  
+
 to start the service
   orchestd.sh start
-
 to update to latest version
   orchestd.sh update
-  
+
 
 browse to $orchestDUrl to begin your journey!"
 
@@ -276,7 +265,5 @@ browse to $orchestDUrl to begin your journey!"
 d=$(date '+%Y-%m-%d-%H:%M:%S')
 event='{"eventType":"end","eventsData":{"Len":"'${startId}'","Checksum":"0"},"session":"install","timestamp":"'${d}'"}'
 curl -X POST "https://stats.orchestd.io/stats" -d "${event}" > /dev/null 2>&1
-
-
 
 xdg-open $orchestDUrl 2> /dev/null

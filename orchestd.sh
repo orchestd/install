@@ -7,7 +7,7 @@ export HEILA_TYPE=HEAD
 export HEILA_ENV=LOCAL
 export GIN_MODE=release
 export TAG=lastmerge
-export DOCKER_NAME=orchestD
+export DOCKER_NAME=orchestd
 
 if [[ ${1} == 'start' ]]; then
   docker-compose -f integrations/docker-compose.yml $1
@@ -30,6 +30,8 @@ DigestNew=$(docker images --digests eu.gcr.io/orchestd-io/servicebuilder --forma
 
 if [[ ${DigestCurrent} != ${DigestNew} ]]; then
   docker-compose -f docker-compose-orchestd.yml stop
+  docker container rm discoveryservice
+  docker container rm orchestd
   docker-compose -f docker-compose-orchestd.yml up -d
   echo "New version updated !"
 else
@@ -37,6 +39,6 @@ else
 fi
 
 else
-  echo "Usage: ./orchestD [start] OR [stop] OR [update]"
+  echo "Usage: ./orchestd [start] OR [stop] OR [update]"
   exit
 fi

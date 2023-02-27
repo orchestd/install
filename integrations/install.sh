@@ -17,68 +17,63 @@ function show {
 	echo -e "${fnt}${txt}`tput sgr0`"
 }
 
+# checking Prerequisites
+function goPrerequisites {
+    which go
+    if [ $? -ne 0 ]; then
+    show "Please install golang\n   https://go.dev/doc/install"
+    exit
+    fi
 
-# Instal Docker
-show "checking Docker.."
-docker -v
-if [ $? -ne 0 ]; then
-show "Need to install Docker"
-show "do you want install?\n[1]Yes\n[2]No"
-    read -p "> " INPSEL
-	case $INPSEL in
-	    "1")
-            show "### Installing docker  ####"
-            ./install_docker_ubuntu.sh
-			;;
-	    "2")
-            exit
-			;;
-	esac
-fi
-show "done"
+    goV=`go version | { read _ _ v _; echo ${v#go}; }`
+    echo $goV
+    if [[ "$goV" < "1.19.0" ]]; then
+      echo "Minimum supported version of golang is 1.19, Please update\nhttps://go.dev/doc/install"
+      exit
+    fi
+}
 
-# Install docker-compose
-show "docker-compose.."
-docker-compose version
-if [ $? -ne 0 ]; then
-show "Need to install docker-compose"
-show "do you want install?\n[1]Yes\n[2]No"
-    read -p "> " INPSEL
-	case $INPSEL in
-	    "1")
-            show "### Installing docker-compose  ####"
-            sudo curl -L "https://github.com/docker/compose/releases/download/1.28.5/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-            sudo chmod +x /usr/local/bin/docker-compose
-            sudo docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions
-			;;
-	    "2")
-            exit
-			;;
-	esac
-fi
-show "done"
+function gitPrerequisites {
+        which git
+        if [ $? -ne 0 ]; then
+        show "Please install git\n   https://git-scm.com/downloads"
+        exit
+        fi
+}
 
+function dockerPrerequisites {
+      which docker
+      if [ $? -ne 0 ]; then
+      show "Please install Docker\n   https://docs.docker.com/engine/install/"
+      exit
+      fi
 
-# Install mongo client
-show "MongoDB"
-ls /etc/apt/sources.list.d | grep mongodb-org-
-if [ $? -ne 0 ]; then
-show "orchestd uses MongoDB for caching"
-show "do you want install MongoDB?\n[1]Yes\n[2]No"
-    read -p "> " INPSEL
-	case $INPSEL in
-	    "1")
-            wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
-            echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
-            sudo apt-get update
-            sudo apt-get install -y  mongodb-org-shell
-            sudo apt-get install -y mongodb-database-tools
-			;;
-	    "2")
-            exit
-			;;
-	esac
-fi
+      docker -v
+}
+
+function dockerComposePrerequisites {
+      which docker-compose
+      if [ $? -ne 0 ]; then
+      show "Please install Docker compose\n   https://docs.docker.com/compose/install/"
+      exit
+      fi
+
+      docker-compose version
+}
+
+function mongoDBPrerequisites {
+      which mongo
+      if [ $? -ne 0 ]; then
+      show "For best experience, we advise you also install Mongo db tools\n   https://www.mongodb.com/docs/mongodb-shell/install/"
+      fi
+      mongo -version
+}
+
+goPrerequisites
+gitPrerequisites
+dockerPrerequisites
+dockerComposePrerequisites
+mongoDBPrerequisites
 
 echo "###  docker-compose run DBs and tools  ###"
 docker-compose -f docker-compose.yml up -d
