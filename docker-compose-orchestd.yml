@@ -2,7 +2,7 @@ services:
   servicebuilder:
     #PORT 29000
     image: ${ORCHESTD_REGISTRY}/servicebuilder:$TAG
-    container_name: "orchestD"
+    container_name: "orchestd"
 
     user: ${DOCKER_USER}
     environment:
@@ -14,13 +14,13 @@ services:
       - GOROOT=/usr/local/go
       - GOPRIVATE
     volumes:
-      - /home/$USER/orchestD:/home/orchestD
+      - /home/$USER/orchestd:/home/orchestd
     labels:
       namespace: monitoring
-      traefik.http.routers.orchestD.rule: Host(`orchestd.localhost`)
-      traefik.http.routers.orchestD.entrypoints: web
-      traefik.http.routers.orchestD.service: orchestD
-      traefik.http.services.orchestD.loadbalancer.server.port: 29000
+      traefik.http.routers.orchestd.rule: Host(`orchestd.localhost`)
+      traefik.http.routers.orchestd.entrypoints: web
+      traefik.http.routers.orchestd.service: orchestd
+      traefik.http.services.orchestd.loadbalancer.server.port: 29000
     network_mode: host
     logging:
       driver: loki
