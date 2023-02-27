@@ -184,6 +184,7 @@ printf "\n\tinsteadOf = https://github.com/\n" >> $fileGitName
 printf "[includeIf \"gitdir:$userPath/src/\"]\n" >> ~/.gitconfig
 printf "path = $userPath/src/"$fileGitName"\n" >> ~/.gitconfig
 
+checkSSHKeyGitHubEmail
 
 isClone=false
 apispecs="apispecs"
@@ -213,8 +214,6 @@ do
     fi
 done
 fi
-
-checkSSHKeyGitHubEmail
 
 cd $origpath
 
