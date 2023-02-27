@@ -12,7 +12,7 @@ export DOCKER_NAME=orchestd
 if [[ ${1} == 'start' ]]; then
   docker-compose -f integrations/docker-compose.yml $1
   docker-compose -f docker-compose-orchestd.yml $1
-  nohup ./orchestD &
+  nohup ./devplatform &
   orchestDUrl=http://127.0.0.1:29000/
   xdg-open $orchestDUrl
 elif [[ ${1} == 'stop' ]]; then
