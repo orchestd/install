@@ -109,14 +109,6 @@ done
 }
 
 function checkSSHKeyGitHubEmail {
-#check if id_ed25519 exist
-
-# if [ ! -f "~/.ssh/id_ed25519" ]; then
-#     echo "id_ed25519 not exist"
-#     sleep 2
-#     read -n 1 -s -r -p ""
-# fi
-
 isEmail=$(cat ~/.ssh/* | grep $gitemail)
 if [[ "$isEmail" == "" ]]; then
 ShowDocHowAddNewSShKey
@@ -252,7 +244,6 @@ fi
 cd $userPath/src
 cloneApiSpecs
 
-cd $userPath/bin/
 pathAlreadyExists=$(grep '~/orchestd/bin' ~/.bashrc)
 if [ ${#pathAlreadyExists} == 0 ]; then
   show "Adding path to ~/.bashrc"
@@ -262,6 +253,7 @@ if [ ${#pathAlreadyExists} == 0 ]; then
   source ~/.bashrc
 fi
 
+cd $userPath/bin/
 nohup ./devplatform &
 sleep 1
 reset
