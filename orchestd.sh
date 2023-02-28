@@ -18,7 +18,7 @@ if [[ ${1} == 'start' ]]; then
 elif [[ ${1} == 'stop' ]]; then
   docker-compose -f integrations/docker-compose.yml $1
   docker-compose -f docker-compose-orchestd.yml $1
-  killall -e orchestd
+  killall -e devplatform
 elif [[ ${1} == 'update' ]]; then
   export TAG=latest
 
