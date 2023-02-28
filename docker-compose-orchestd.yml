@@ -9,7 +9,7 @@ services:
       - HEILA_TYPE=HEAD
       - HEILA_ENV=LOCAL
       - GIN_MODE
-      - DOCKER_NAME=orchestD
+      - DOCKER_NAME=orchestd
       - GOPATH=/home/work
       - GOROOT=/usr/local/go
       - GOPRIVATE

@@ -23,6 +23,7 @@ export GIN_MODE=release
 export TAG=latest
 export DOCKER_NAME=orchestd
 
+
 function show {
 	if [ "$1" == "-e" ]
 	then
@@ -108,6 +109,14 @@ done
 }
 
 function checkSSHKeyGitHubEmail {
+#check if id_ed25519 exist
+
+# if [ ! -f "~/.ssh/id_ed25519" ]; then
+#     echo "id_ed25519 not exist"
+#     sleep 2
+#     read -n 1 -s -r -p ""
+# fi
+
 isEmail=$(cat ~/.ssh/* | grep $gitemail)
 if [[ "$isEmail" == "" ]]; then
 ShowDocHowAddNewSShKey
@@ -136,6 +145,54 @@ function confirmeGitParams {
     	esac
     done
 }
+
+function createGitConfig {
+fileGitName=".gitconfig"
+printf "[user]\n" > $fileGitName
+printf "\tname = $gituser\n" >> $fileGitName
+printf "\temail = $gitemail\n\n" >> $fileGitName
+printf '[url "ssh://git@github.com/"]' >> $fileGitName
+printf "\n\tinsteadOf = https://github.com/\n" >> $fileGitName
+
+printf "[includeIf \"gitdir:$userPath/src/\"]\n" >> ~/.gitconfig
+printf "path = $userPath/src/"$fileGitName"\n" >> ~/.gitconfig
+}
+
+function cloneApiSpecs {
+isClone=false
+apispecs="apispecs"
+if [ -d "${apispecs}" ];
+then
+    show "$apispecs repo exists."
+else
+while [[ $isClone = false ]]
+do
+    if git clone $gitUrl/$apispecs.git > /dev/null 2>&1; then
+    pwd
+    	cd $apispecs
+    	README="README.md"
+    	if [ ! -f "${README}" ]; then
+        echo "# apispecs-" >> README.md
+        git init
+        git add README.md
+        git commit -m "first commit"
+        git branch -M main
+        git remote add origin $gitUrl/$apispecs.git
+        git push -u origin main
+    	fi
+    isClone=true
+      else
+    reset
+    show "In order to work on a project and keep track on your specs, you need to create an 'apispecs' repo on your github accout"
+    show "*** and make sure to check the option 'Add a README file' ***"
+    show "Please open this link https://github.com/new?repo_name=$apispecs to create repo"
+    show '###   When your done create repo, please press [enter]'
+    read -n 1 -s -r -p ""
+    fi
+done
+fi
+}
+
 
 readGitFromEnv
 
@@ -170,50 +227,9 @@ fi
 
 printf "{\n\t\"server\":\"$gitUrl\",\n\t\"gitUser\":\"$gituser\",\n\t\"gitEmail\":\"$gitemail\",\n\t\"devBranch\": \"main\",\n\t\"lockedBranches\":[\"dev\",\"master\",\"main\"]\n}\n" > ${userPath}/settings/git.json
 
-#show "go to src folder"
 cd $userPath/src
-
-#show "create git env"
-fileGitName=".gitconfig"
-printf "[user]\n" > $fileGitName
-printf "\tname = $gituser\n" >> $fileGitName
-printf "\temail = $gitemail\n\n" >> $fileGitName
-printf '[url "ssh://git@github.com/"]' >> $fileGitName
-printf "\n\tinsteadOf = https://github.com/\n" >> $fileGitName
-
-printf "[includeIf \"gitdir:$userPath/src/\"]\n" >> ~/.gitconfig
-printf "path = $userPath/src/"$fileGitName"\n" >> ~/.gitconfig
-
 checkSSHKeyGitHubEmail
-
-isClone=false
-apispecs="apispecs"
-if [ -d "${apispecs}" ];
-then
-    show "$apispecs repo exists."
-else
-while [[ $isClone = false ]]
-do
-    if git clone $gitUrl/$apispecs > /dev/null 2>&1; then
-    	cd $apispecs
-    	README="README.md"
-    	if [ ! -f "${README}" ]; then
-    	   echo "apispecs" > $README
-    	   git add .
-    	   git commit -m "initial commit"
-    	   git push
-    	fi
-    isClone=true
-      else
-    reset
-    show "In order to work on a project and keep track on your specs, you need to create an 'apispecs' repo on your github accout"
-    show "*** and make sure to check the option 'Add a README file' ***"
-    show "Please open this link https://github.com/new?repo_name=$apispecs to create repo"
-    show '###   When your done create repo, please press [enter]'
-    read -n 1 -s -r -p ""
-    fi
-done
-fi
+createGitConfig
 
 cd $origpath
 
@@ -233,6 +249,10 @@ then
   ln -s $userPath/settings $userPath/bin
 fi
 
+cd $userPath/src
+cloneApiSpecs
+
+cd $userPath/bin/
 pathAlreadyExists=$(grep '~/orchestd/bin' ~/.bashrc)
 if [ ${#pathAlreadyExists} == 0 ]; then
   show "Adding path to ~/.bashrc"
