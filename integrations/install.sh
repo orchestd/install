@@ -65,9 +65,10 @@ function mongoDBPrerequisites {
       which mongo
       if [ $? -ne 0 ]; then
       show "For best experience, we advise you also install Mongo db tools\n   https://www.mongodb.com/docs/mongodb-shell/install/"
-      exit 1
-      fi
+      else
       mongo -version
+      fi
+
 }
 
 goPrerequisites
@@ -75,6 +76,3 @@ gitPrerequisites
 dockerPrerequisites
 dockerComposePrerequisites
 mongoDBPrerequisites
-
-echo "###  docker-compose run DBs and tools  ###"
-docker-compose -f docker-compose.yml up -d

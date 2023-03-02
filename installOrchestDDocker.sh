@@ -238,6 +238,8 @@ cp -r orchestd.sh $userPath/bin
 cp -r integrations $userPath/bin/integrations
 
 cd $userPath/bin/
+echo "### docker-compose run DBs and tools ###"
+docker-compose -f integrations/docker-compose.yml up -d
 show "###  docker-compose run orchestD  ###"
 docker-compose -f docker-compose-orchestd.yml up -d
 
