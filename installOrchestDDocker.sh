@@ -10,6 +10,12 @@ curl -X POST "https://stats.orchestd.io/stats" -d "${event}" > /dev/null 2>&1
 
 cd integrations
 ./install.sh
+if [[ $? -ne 0 ]];then
+show "installation stoped - at any time you can continue the installation
+cd $origpath
+./installOrchestDDocker.sh"
+  exit 1
+fi
 cd ..
 
 reset;
@@ -232,6 +238,8 @@ cp -r orchestd.sh $userPath/bin
 cp -r integrations $userPath/bin/integrations
 
 cd $userPath/bin/
+echo "### docker-compose run DBs and tools ###"
+docker-compose -f integrations/docker-compose.yml up -d
 show "###  docker-compose run orchestD  ###"
 docker-compose -f docker-compose-orchestd.yml up -d
 
