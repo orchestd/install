@@ -22,14 +22,14 @@ function goPrerequisites {
     which go
     if [ $? -ne 0 ]; then
     show "Please install golang\n   https://go.dev/doc/install"
-    exit
+    exit 1
     fi
 
     goV=`go version | { read _ _ v _; echo ${v#go}; }`
     echo $goV
     if [[ "$goV" < "1.19.0" ]]; then
       echo "Minimum supported version of golang is 1.19, Please update\nhttps://go.dev/doc/install"
-      exit
+      exit 1
     fi
 }
 
@@ -37,7 +37,7 @@ function gitPrerequisites {
         which git
         if [ $? -ne 0 ]; then
         show "Please install git\n   https://git-scm.com/downloads"
-        exit
+        exit 1
         fi
 }
 
@@ -45,7 +45,7 @@ function dockerPrerequisites {
       which docker
       if [ $? -ne 0 ]; then
       show "Please install Docker\n   https://docs.docker.com/engine/install/"
-      exit
+      exit 1
       fi
 
       docker -v
@@ -55,7 +55,7 @@ function dockerComposePrerequisites {
       which docker-compose
       if [ $? -ne 0 ]; then
       show "Please install Docker compose\n   https://docs.docker.com/compose/install/"
-      exit
+      exit 1
       fi
 
       docker-compose version
@@ -65,6 +65,7 @@ function mongoDBPrerequisites {
       which mongo
       if [ $? -ne 0 ]; then
       show "For best experience, we advise you also install Mongo db tools\n   https://www.mongodb.com/docs/mongodb-shell/install/"
+      exit 1
       fi
       mongo -version
 }

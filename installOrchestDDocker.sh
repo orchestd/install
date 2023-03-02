@@ -10,6 +10,12 @@ curl -X POST "https://stats.orchestd.io/stats" -d "${event}" > /dev/null 2>&1
 
 cd integrations
 ./install.sh
+if [[ $? -ne 0 ]];then
+show "instalation stoped - at any time you can continue the installation
+cd $origpath
+./installOrchestDDocker.sh"
+  exit 1
+fi
 cd ..
 
 reset;
