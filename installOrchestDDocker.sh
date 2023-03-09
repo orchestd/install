@@ -233,9 +233,9 @@ cd $origpath
 
 # copy install folder
 mkdir -p $userPath/bin/install
-cp -r docker-compose-orchestd.yml $userPath/bin
-cp -r orchestd.sh $userPath/bin
-cp -r integrations $userPath/bin/integrations
+cp -r docker-compose-orchestd.yml $userPath/bin/install
+cp -r orchestd.sh $userPath/bin/install
+cp -r integrations $userPath/bin/integrations/install
 
 cd $userPath/bin/
 echo "### docker-compose run DBs and tools ###"
